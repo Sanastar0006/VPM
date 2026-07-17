@@ -1,0 +1,115 @@
+/**
+ * VP MICROFINANCE PRO 2026 - YONO SBI Luxury Edition
+ * Backend Infrastructure Engine (Code.gs)
+ */
+
+// Core Configuration - The script binds automatically to the active sheet container
+const DB = SpreadsheetApp.getActiveSpreadsheet();
+
+/**
+ * Handle incoming POST requests from the client frontend application
+ */
+function doPost(e) {
+  try {
+    const requestData = JSON.parse(e.postData.contents);
+    const action = requestData.action;
+    const data = requestData.data;
+    
+    let responseOutput;
+    
+    switch (action) {
+      case 'saveCustomer':
+        responseOutput = saveCustomerToSheet(data);
+        break;
+      case 'generateAccountNumber':
+        responseOutput = { status: 'success', accountNo: executeAccountGeneration() };
+        break;
+      default:
+        throw new Error('Invalid system action requested.');
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify(responseOutput))
+                         .setMimeType(ContentService.MimeType.JSON);
+                         
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
+                         .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * Handle incoming GET requests (useful for data verification or testing)
+ */
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: 'active', message: 'VP Microfinance Core Engine Node Online.' }))
+                       .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Appends customer data packages seamlessly into the ledger matrix
+ */
+function saveCustomerToSheet(customer) {
+  const sheet = DB.getSheetByName('Customers');
+  if (!sheet) {
+    throw new Error('Database Tab mismatch: "Customers" sheet not found.');
+  }
+  
+  // Clean check to prevent explicit Account duplicates
+  const accountNo = customer.accountNo || executeAccountGeneration();
+  if (isAccountDuplicate(sheet, accountNo)) {
+    throw new Error('Account Collision Detected: The generated reference already exists.');
+  }
+
+  // Row structure matching configuration
+  sheet.appendRow([
+    accountNo,
+    customer.customerName,
+    "'" + customer.mobile, // Added string force token prefix to preserve leading zeroes
+    customer.principal,
+    customer.interestRate,
+    customer.frequency,
+    customer.duration,
+    customer.startDate,
+    customer.endDate,
+    customer.emi,
+    customer.totalOutstanding,
+    new Date() // Timestamp logging
+  ]);
+  
+  return { status: 'success', accountNo: accountNo };
+}
+
+/**
+ * Checks if account identifier exists within the dynamic system matrix
+ */
+function isAccountDuplicate(sheet, accountNo) {
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === accountNo) return true;
+  }
+  return false;
+}
+
+/**
+ * High-Integrity Account Generation Protocol
+ */
+function executeAccountGeneration() {
+  const sheet = DB.getSheetByName('Customers');
+  if (!sheet) return 'VP-' + Math.floor(100000 + Math.random() * 900000);
+  
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return 'VP-1001'; // Fallback seed baseline value
+  }
+  
+  // Read the last account identifier signature sequence safely
+  const lastAccountStr = sheet.getRange(lastRow, 1).getValue().toString();
+  const numericSequence = parseInt(lastAccountStr.replace('VP-', ''), 10);
+  
+  if (isNaN(numericSequence)) {
+    return 'VP-' + Math.floor(100000 + Math.random() * 900000);
+  }
+  
+  // Dynamic increment sequence progression modeling
+  return 'VP-' + (numericSequence + 1);
+}

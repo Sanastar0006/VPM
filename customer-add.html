@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer | VP MICROFINANCE PRO 2026</title>
+    <!-- Fonts & Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0b0f19;
+            color: #e2e8f0;
+        }
+        .yono-gradient {
+            background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        select option {
+            background: #111827;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar Linkage (Consistent with Index Layout) -->
+    <aside id="sidebar" class="w-64 glass-card h-full flex flex-col transition-all duration-300 absolute z-50 md:relative md:translate-x-0 -translate-x-full">
+        <div class="p-6 flex items-center gap-3 border-b border-white/5">
+            <div class="w-10 h-10 yono-gradient rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-building-columns text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-white font-bold text-lg leading-tight">VP MICRO</h1>
+                <p class="text-[10px] text-purple-400 uppercase tracking-widest">PRO 2026</p>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden ml-auto text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <p class="text-xs text-slate-500 font-semibold px-3 mb-2 uppercase tracking-wider">Main Menu</p>
+            <a href="index.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                <i class="fa-solid fa-border-all w-5 text-center"></i>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-3 yono-gradient text-white rounded-xl shadow-md">
+                <i class="fa-solid fa-user-plus w-5 text-center"></i>
+                <span class="text-sm font-medium">Add Customer</span>
+            </a>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                <i class="fa-solid fa-users w-5 text-center"></i>
+                <span class="text-sm font-medium">Customer List</span>
+            </a>
+            <a href="transaction.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                <i class="fa-solid fa-wallet w-5 text-center"></i>
+                <span class="text-sm font-medium">Transactions</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all">
+                <i class="fa-solid fa-power-off w-5 text-center"></i>
+                <span class="text-sm font-medium">Secure Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        <!-- Top Navigation -->
+        <header class="glass-card h-20 px-6 flex items-center justify-between z-10 sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-300 hover:text-white p-2 rounded-lg bg-white/5">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h2 class="text-xl font-semibold text-white">Customer Registration</h2>
+            </div>
+            <div class="text-xs bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full text-purple-400 font-medium">
+                Standard Node Sync Active
+            </div>
+        </header>
+
+        <!-- Dynamic Form Body Area -->
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <form id="customerForm" onsubmit="handleCustomerSubmit(event)" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Primary Entry Form Section -->
+                <div class="glass-card p-6 rounded-2xl lg:col-span-2 space-y-6">
+                    <h3 class="text-md font-semibold text-purple-400 border-b border-white/5 pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-address-card"></i> Personal & Loan Parameters
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Auto Generated A/C Field -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Account Number (Auto)</label>
+                            <input type="text" id="accountNo" readonly placeholder="Generating..." class="w-full px-4 py-2.5 bg-white/5 border border-purple-500/20 rounded-xl text-purple-300 font-mono font-bold focus:outline-none cursor-not-allowed">
+                        </div>
+
+                        <!-- Full Name -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Customer Full Name *</label>
+                            <input type="text" id="customerName" required placeholder="Enter full name" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Mobile Line *</label>
+                            <input type="tel" id="mobile" required placeholder="10 Digit Number" pattern="[0-9]{10}" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        </div>
+
+                        <!-- Loan Principal Amount -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Principal Loan Amount (₹) *</label>
+                            <input type="number" id="principal" required min="1000" placeholder="e.g. 50000" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        </div>
+
+                        <!-- Interest Rate Rate Type -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Interest Rate (% per annum) *</label>
+                            <input type="number" id="interestRate" required step="0.01" placeholder="e.g. 12" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        </div>
+
+                        <!-- Term Duration Type -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Frequency Type *</label>
+                            <select id="frequency" required class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
+                                <option value="Daily">Daily Installments</option>
+                                <option value="Weekly">Weekly Installments</option>
+                                <option value="Monthly" selected>Monthly Installments</option>
+                            </select>
+                        </div>
+
+                        <!-- Tenure Count -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Total Installment Term Count *</label>
+                            <input type="number" id="duration" required min="1" placeholder="Number of collection points" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+                        </div>
+
+                        <!-- Start Disbursal Date -->
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Disbursal / Start Date *</label>
+                            <input type="date" id="startDate" required class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
+
+                        <!-- Auto-Calculated End Date -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Maturity End Date (Auto-Calculated)</label>
+                            <input type="date" id="endDate" readonly class="w-full px-4 py-2.5 bg-white/5 border border-purple-500/20 rounded-xl text-slate-400 focus:outline-none cursor-not-allowed">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator Visual Preview Sidebar Panel -->
+                <div class="space-y-6">
+                    <div class="glass-card p-6 rounded-2xl relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl"></div>
+                        
+                        <h3 class="text-md font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-purple-400"></i> Investment Metrics
+                        </h3>
+
+                        <div class="space-y-4 text-sm">
+                            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span class="text-slate-400">Total Interest Due</span>
+                                <span id="lblTotalInterest" class="font-bold text-white">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                <span class="text-slate-400">Gross Total Repayable</span>
+                                <span id="lblTotalRepayable" class="font-bold text-white">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-purple-600/10 rounded-xl border border-purple-500/20">
+                                <span class="text-purple-300 font-medium">Installment EMI</span>
+                                <span id="lblEMI" class="font-bold text-lg text-purple-400">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Command Module Action Buttons -->
+                    <div class="glass-card p-4 rounded-2xl space-y-3">
+                        <button type="submit" class="w-full py-3.5 yono-gradient text-white rounded-xl font-medium tracking-wide shadow-lg hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Save & Sync to Cloud Sheets
+                        </button>
+                        <button type="reset" onclick="resetCalculatorLabels()" class="w-full py-3 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all">
+                            Clear Registration Fields
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- UI Infrastructure Control Script Section -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function resetCalculatorLabels() {
+            document.getElementById('lblTotalInterest').innerText = '₹0.00';
+            document.getElementById('lblTotalRepayable').innerText = '₹0.00';
+            document.getElementById('lblEMI').innerText = '₹0.00';
+        }
+
+        // Mock Account Generation for UI phase validation 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('accountNo').value = 'VP-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        function handleCustomerSubmit(e) {
+            e.preventDefault();
+            alert('Machi, structure logic is running! Ready for the backend connection script to save.');
+        }
+    </script>
+</body>
+</html>
