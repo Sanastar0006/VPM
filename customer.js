@@ -1,76 +1,71 @@
-/**
- * VP MICROFINANCE PRO 2026 - YONO SBI Luxury Edition
- * Pure Math Engine & Sheets Gateway (customer.js)
- */
-
+// Unga kotha Apps Script Deployment URL-ai inga paste pannunga machi!
 const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Setup real-time listeners for calculating values
-    const trackingInputs = ['principal', 'interestRate', 'frequency', 'duration', 'startDate'];
-    trackingInputs.forEach(id => {
-        const node = document.getElementById(id);
-        if (node) {
-            node.addEventListener('input', runMicrofinanceCalculatorEngine);
-            node.addEventListener('change', runMicrofinanceCalculatorEngine);
+    // Math listener engine dynamic triggers setup
+    const inputIds = ['principal', 'interestRate', 'frequency', 'duration', 'startDate'];
+    inputIds.forEach(id => {
+        const inputNode = document.getElementById(id);
+        if (inputNode) {
+            inputNode.addEventListener('input', executeLiveFinancialEngine);
+            inputNode.addEventListener('change', executeLiveFinancialEngine);
         }
     });
 
-    // 2. Load automatic initial account sequential numbers
-    initializeSequentialCLAN();
-    
-    // 3. Set dynamic default base date
+    // Generate functional automated tracking sequential id
+    generateAutomatedCLAN();
+
+    // Default current time baseline date
     const startField = document.getElementById('startDate');
-    if(startField && !startField.value) {
+    if (startField && !startField.value) {
         startField.value = new Date().toISOString().split('T')[0];
     }
     
-    // Initial dynamic baseline run
-    runMicrofinanceCalculatorEngine();
+    executeLiveFinancialEngine();
 });
 
-function initializeSequentialCLAN() {
-    const acField = document.getElementById('accountNo');
-    if (acField) {
+function generateAutomatedCLAN() {
+    const acNode = document.getElementById('accountNo');
+    if (acNode) {
         let currentSeed = localStorage.getItem('vp_clan_seed');
         if (!currentSeed) {
-            currentSeed = 1005; // Base sequence layout seed number
+            currentSeed = 1005; // Starting dynamic benchmark seed row
         }
         currentSeed = parseInt(currentSeed) + 1;
         localStorage.setItem('vp_clan_seed', currentSeed);
-        acField.value = `VP-${currentSeed}`;
+        acNode.value = `VP-${currentSeed}`;
     }
 }
 
-function runMicrofinanceCalculatorEngine() {
+function executeLiveFinancialEngine() {
     const principal = parseFloat(document.getElementById('principal').value) || 0;
-    const annualRate = parseFloat(document.getElementById('interestRate').value) || 0;
-    const durationMonths = parseInt(document.getElementById('duration').value) || 0;
+    const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const duration = parseInt(document.getElementById('duration').value) || 0;
     const frequency = document.getElementById('frequency').value;
-    const startDateVal = document.getElementById('startDate').value;
+    const startDate = document.getElementById('startDate').value;
 
-    if (principal <= 0 || annualRate <= 0 || durationMonths <= 0) return;
+    if (principal <= 0 || rate <= 0 || duration <= 0) return;
 
-    // Core Matrix Finance Equation Layer
-    const totalInterest = principal * (annualRate / 100) * (durationMonths / 12);
-    const totalOutstanding = principal + totalInterest;
+    // Financial calculations matrix
+    const computedInterest = principal * (rate / 100) * (duration / 12);
+    const totalRepayable = principal + computedInterest;
 
-    let totalInstallments = durationMonths;
-    if (frequency === 'Weekly') totalInstallments = Math.round(durationMonths * 4.34);
-    else if (frequency === 'Daily') totalInstallments = durationMonths * 30;
+    let installmentsCount = duration;
+    if (frequency === 'Weekly') installmentsCount = Math.round(duration * 4.34);
+    else if (frequency === 'Daily') installmentsCount = duration * 30;
 
-    const emiSplit = totalInstallments > 0 ? totalOutstanding / totalInstallments : 0;
+    const finalEmi = installmentsCount > 0 ? totalRepayable / installmentsCount : 0;
 
-    // Inject values cleanly back into display targets
-    document.getElementById('lblTotalInterest').innerText = `₹${totalInterest.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    document.getElementById('lblTotalRepayable').innerText = `₹${totalOutstanding.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    document.getElementById('lblEMI').innerText = `₹${emiSplit.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    // DOM UI Injection
+    document.getElementById('lblTotalInterest').innerText = `₹${computedInterest.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+    document.getElementById('lblTotalRepayable').innerText = `₹${totalRepayable.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+    document.getElementById('lblEMI').innerText = `₹${finalEmi.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
 
-    // Handle automated Maturity End Date logic calculation
-    if (startDateVal) {
-        const start = new Date(startDateVal);
-        start.setMonth(start.getMonth() + durationMonths);
-        document.getElementById('endDate').value = start.toISOString().split('T')[0];
+    // Automated End Date Computation
+    if (startDate) {
+        const calculatedDate = new Date(startDate);
+        calculatedDate.setMonth(calculatedDate.getMonth() + duration);
+        document.getElementById('endDate').value = calculatedDate.toISOString().split('T')[0];
     }
 }
 
@@ -92,17 +87,17 @@ function saveCustomerDataToServerPipeline() {
     };
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Syncing to Google Sheets...`;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Sending Data to Cloud...`;
 
-    // Instantly queue transaction data array sequence into cache layout buffer
+    // Local Storage dynamic fallback synchronization matrix layout array push
     let localLedger = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
     localLedger.unshift(customerPayload);
     localStorage.setItem('vp_local_customers', JSON.stringify(localLedger));
 
-    // Dynamic direct query injection parameters handling strategy to bypass standard CORS structural constraints 
-    const finalEndpointUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
+    // GET query request payload configuration architecture rules
+    const targetUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
 
-    fetch(finalEndpointUrl, {
+    fetch(targetUrl, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache'
@@ -110,12 +105,12 @@ function saveCustomerDataToServerPipeline() {
     .then(res => res.json())
     .then(result => {
         if(result && result.status === 'success') {
-            alert('🎉 Success Machi! Account perfectly registered on Cloud Data Sheet!');
+            alert('🎉 Perfect Machi! Data accurately recorded in Google Sheets Database!');
         }
         window.location.href = "customer-list.html";
     })
     .catch(err => {
-        console.warn("Bypassed network server check parameters:", err);
+        console.warn("Bypassed server check parameters node direct route integration:", err);
         window.location.href = "customer-list.html";
     });
 }
