@@ -23,168 +23,164 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
+        /* Custom scrollbar layout styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
     </style>
 </head>
-<body class="min-h-screen flex bg-[#060814] overflow-x-hidden">
+<body class="min-h-screen bg-[#060814] text-slate-100 flex">
 
-    <aside id="sidebar" class="w-64 glass-card border-r border-white/5 fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between p-4 m-0 lg:m-3 lg:rounded-2xl lg:h-[calc(100vh-24px)]">
-        <div>
-            <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
-                <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md shadow-purple-500/20">VP</div>
-                <div>
-                    <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
-                    <p class="text-[10px] text-purple-400 font-medium">SBI Luxury Pro 2026</p>
-                </div>
+    <aside id="sidebar" class="w-64 glass-card fixed inset-y-0 left-0 z-50 p-4 m-3 rounded-2xl h-[calc(100vh-24px)] transition-transform duration-300 lg:translate-x-0 -translate-x-full lg:static">
+        <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
+            <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md">VP</div>
+            <div>
+                <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
+                <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
             </div>
-
-            <nav class="space-y-1">
-                <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
-                    <i class="fa-solid fa-chart-pie text-sm group-hover:text-purple-400 transition-colors"></i> Executive Dashboard
-                </a>
-                <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
-                    <i class="fa-solid fa-user-plus text-sm group-hover:text-purple-400 transition-colors"></i> Capital Disbursement
-                </a>
-                <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium transition-all shadow-md shadow-purple-950/20">
-                    <i class="fa-solid fa-address-book text-sm"></i> Customer Ledger
-                </a>
-                <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
-                    <i class="fa-solid fa-money-bill-transfer text-sm group-hover:text-purple-400 transition-colors"></i> EMI Post Credit
-                </a>
-            </nav>
         </div>
-
-        <div class="p-2 border-t border-white/5 pt-4">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-user-shield text-slate-300"></i></div>
-                <div>
-                    <p class="text-[11px] font-medium text-slate-200">Admin Account</p>
-                    <span class="text-[9px] text-emerald-400 font-mono block flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Node Active</span>
-                </div>
-            </div>
-            <a href="login.html" class="w-full py-2 bg-white/5 hover:bg-rose-950/20 hover:text-rose-400 border border-white/5 rounded-xl text-[11px] font-medium transition-all text-center block text-slate-400">
-                <i class="fa-solid fa-power-off mr-1.5 text-[10px]"></i> Secure Sign Out
+        <nav class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
+                <i class="fa-solid fa-chart-pie group-hover:text-purple-400"></i> Dashboard Matrix
             </a>
-        </div>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
+                <i class="fa-solid fa-user-plus group-hover:text-purple-400"></i> Capital Disbursement
+            </a>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all">
+                <i class="fa-solid fa-address-book"></i> Customer Ledger
+            </a>
+        </nav>
     </aside>
 
-    <main class="flex-1 min-w-0 lg:pl-72 p-4 lg:p-6 transition-all duration-300">
+    <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
         
-        <header class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+        <header class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
             <div class="flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="lg:hidden w-9 h-9 glass-card rounded-xl flex items-center justify-center text-slate-300 border border-white/5"><i class="fa-solid fa-bars"></i></button>
+                <button onclick="toggleSidebarLayout()" class="lg:hidden p-2 text-slate-400 hover:text-white glass-card rounded-xl text-xs"><i class="fa-solid fa-bars"></i></button>
                 <div>
-                    <h2 class="text-base font-semibold text-white tracking-tight">Active Customer Ledger</h2>
-                    <p class="text-xs text-slate-400 hidden sm:block">Live synchronization pipeline audit data matrix.</p>
+                    <h2 class="text-base font-semibold text-white tracking-wide">Active Customer Ledger</h2>
+                    <p class="text-xs text-slate-400">Enterprise operational data cache pipelines.</p>
                 </div>
             </div>
+            
+            <button onclick="window.location.href='customer-add.html'" class="px-4 py-2 yono-gradient text-white rounded-xl text-xs font-medium hover:opacity-90 shadow-md transition-all flex items-center gap-2">
+                <i class="fa-solid fa-plus text-[10px]"></i> Onboard Account
+            </button>
         </header>
 
-        <div class="glass-card border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-            <div class="p-4 bg-white/[0.02] border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider"><i class="fa-solid fa-database mr-1.5"></i> Live Ledger Profiles</span>
-                <span id="syncStatusBadge" class="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-medium bg-amber-950/40 text-amber-400 border border-amber-500/20"><i class="fa-solid fa-circle-notch animate-spin mr-1"></i> Syncing Node Cache...</span>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+        <div class="glass-card rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
-                        <tr class="border-b border-white/5 bg-white/[0.01]">
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">CLAN ID</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Customer Name</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Mobile Terminal</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Principal</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Frequency</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Calculated EMI</th>
-                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Outstanding</th>
+                        <tr class="bg-white/[0.02] border-b border-white/5 text-[10px] tracking-wider text-slate-400 font-semibold uppercase">
+                            <th class="px-6 py-4">Account No</th>
+                            <th class="px-6 py-4">Customer Name</th>
+                            <th class="px-6 py-4">Schema Plan</th>
+                            <th class="px-6 py-4">EMI Installment</th>
+                            <th class="px-6 py-4">Total Outstanding</th>
+                            <th class="px-6 py-4">Status Token</th>
+                            <th class="px-6 py-4 text-right">Operational Engine</th>
                         </tr>
                     </thead>
-                    <tbody id="customerTableBody" class="divide-y divide-white/5 text-xs">
+                    <tbody id="customerTableBody" class="divide-y divide-white/5 text-xs text-slate-300">
                         </tbody>
                 </table>
             </div>
         </div>
     </main>
 
+    <div id="actionModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 hidden">
+        <div class="glass-card w-full max-w-lg rounded-2xl p-6 border border-white/10 shadow-2xl relative">
+            
+            <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+                <h3 id="modalTitle" class="text-xs font-bold tracking-wider uppercase text-purple-400">Registry Workspace</h3>
+                <button onclick="closeActionModal()" class="text-slate-400 hover:text-white text-sm transition-all"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="modalForm" onsubmit="handleModalExecutionPipeline(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase">Account Number ID</label>
+                        <input type="text" id="modalAccountNo" readonly class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-purple-300 font-mono font-bold text-xs focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase">Customer Legal Identity</label>
+                        <input type="text" id="modalName" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase">Mobile Connection Terminal</label>
+                        <input type="tel" id="modalMobile" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase">Disbursed Principal (₹)</label>
+                        <input type="number" id="modalPrincipal" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1 uppercase">Calculated Installment Valuation (₹)</label>
+                    <input type="number" id="modalEMI" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-emerald-400 font-mono font-bold text-xs focus:outline-none">
+                </div>
+
+                <div id="modalActionButtons" class="flex justify-end gap-3 border-t border-white/5 pt-4 mt-6">
+                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all">Dismiss View</button>
+                    <button type="submit" id="modalSubmitBtn" class="px-5 py-2 yono-gradient text-white rounded-xl text-xs font-medium shadow-md hover:opacity-90 transition-all">Synchronize Parameters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="customer-actions.js"></script>
     <script>
-        function toggleSidebar() {
+        function toggleSidebarLayout() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        const CORE_FETCH_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
+        // Real-time table render dynamic buffer matrix pipeline execution
+        function renderActiveLedgerGrid() {
+            const tableBody = document.getElementById('customerTableBody');
+            if (!tableBody) return;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderMasterLedgerGridData();
-        });
+            // Load arrays accurately from local structural ledger pipeline
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            tableBody.innerHTML = '';
 
-        function renderMasterLedgerGridData() {
-            const tbody = document.getElementById('customerTableBody');
-            const badge = document.getElementById('syncStatusBadge');
-            tbody.innerHTML = '';
-
-            // Step 1: Load and prioritize immediate Local Buffer records (Instant data representation)
-            let rawBufferData = localStorage.getItem('vp_local_customers');
-            let combinedLedger = [];
-
-            if (rawBufferData) {
-                try {
-                    combinedLedger = JSON.parse(rawBufferData);
-                } catch(e) {
-                    console.error("Buffer decode mismatch:", e);
-                }
+            if (customers.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-12 text-slate-500 text-xs font-medium"><i class="fa-solid fa-folder-open block text-lg mb-2 text-slate-600"></i> No accounts registered inside local dataset matrix bounds.</td></tr>`;
+                return;
             }
 
-            // Fallback Seed Data array layers mapping if absolutely empty
-            if (combinedLedger.length === 0) {
-                combinedLedger = [
-                    { accountNo: 'VP-900001', customerName: 'Muthu Kumar', mobile: '9876543210', principal: 40000, frequency: 'Monthly', emi: 3750, totalOutstanding: 45000 },
-                    { accountNo: 'VP-900002', customerName: 'Anitha Raj', mobile: '8765432109', principal: 15000, frequency: 'Weekly', emi: 315, totalOutstanding: 16400 }
-                ];
-            }
+            customers.forEach((user, idx) => {
+                const cleanEmi = parseFloat(user.emi) || 0;
+                const cleanOutstanding = parseFloat(user.totalOutstanding) || 0;
 
-            // Function framework to loop and render row entries into Viewport Table
-            function renderRowsToTable(dataset) {
-                tbody.innerHTML = '';
-                if(dataset.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-medium">No customer profiles active within matrix ledger pipeline limits.</td></tr>`;
-                    return;
-                }
-                
-                dataset.forEach(profile => {
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-white/[0.02] transition-colors group";
-                    row.innerHTML = `
-                        <td class="p-4 font-mono font-semibold text-purple-400 tracking-wide">${profile.accountNo || 'VP-N/A'}</td>
-                        <td class="p-4 font-medium text-slate-200 group-hover:text-white transition-colors">${profile.customerName || 'N/A'}</td>
-                        <td class="p-4 font-mono text-slate-400">${profile.mobile || 'N/A'}</td>
-                        <td class="p-4 text-slate-300 font-medium">₹${(parseFloat(profile.principal) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-medium ${profile.frequency === 'Daily' ? 'bg-amber-950/50 text-amber-400 border border-amber-500/20' : profile.frequency === 'Weekly' ? 'bg-blue-950/50 text-blue-400 border border-blue-500/20' : 'bg-purple-950/50 text-purple-400 border border-purple-500/20'}">${profile.frequency || 'Monthly'}</span></td>
-                        <td class="p-4 text-emerald-400 font-mono font-semibold">₹${(parseFloat(profile.emi) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                        <td class="p-4 text-amber-400 font-mono font-bold">₹${(parseFloat(profile.totalOutstanding) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-
-            // Render local data instantly
-            renderRowsToTable(combinedLedger);
-            badge.className = "px-2.5 py-0.5 rounded-full text-[9px] font-mono font-medium bg-emerald-950/40 text-emerald-400 border border-emerald-500/20";
-            badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Data Node Buffer Synced`;
-
-            // Step 2: Live Remote Spreadsheet Pipeline Handshake Async Fetch Check
-            if (CORE_FETCH_URL && !CORE_FETCH_URL.includes("YOUR_APPS_SCRIPT")) {
-                fetch(`${CORE_FETCH_URL}?action=getCustomers`)
-                .then(res => res.json())
-                .then(cloudPayload => {
-                    if(cloudPayload && cloudPayload.status === 'success' && Array.isArray(cloudPayload.data)) {
-                        // Merge cloud data over local structural simulation cache layers if active
-                        renderRowsToTable(cloudPayload.data);
-                    }
-                })
-                .catch(err => {
-                    console.warn("Cloud live payload sync delayed, keeping local cached layer views:", err);
-                });
-            }
+                tableBody.innerHTML += `
+                    <tr class="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
+                        <td class="px-6 py-4 font-mono font-bold text-purple-400">${user.accountNo || 'VP-N/A'}</td>
+                        <td class="px-6 py-4 text-white font-medium">${user.customerName || 'Unknown Identity'}</td>
+                        <td class="px-6 py-4 text-slate-400">${user.frequency || 'Monthly'}</td>
+                        <td class="px-6 py-4 text-emerald-400 font-semibold font-mono">₹${cleanEmi.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="px-6 py-4 text-amber-400 font-semibold font-mono">₹${cleanOutstanding.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-0.5 text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-full">Live Connection</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="viewCustomerProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-purple-600/20 transition-all" title="View Profile"><i class="fa-solid fa-eye text-[11px]"></i></button>
+                                <button onclick="editCustomerProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-amber-600/20 transition-all" title="Edit Properties"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
         }
+
+        // Synchronize on script viewport activation trigger bound
+        document.addEventListener('DOMContentLoaded', renderActiveLedgerGrid);
     </script>
 </body>
 </html>
