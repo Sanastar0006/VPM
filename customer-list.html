@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Ledger | VP MICROFINANCE PRO 2026</title>
-    <!-- Fonts & Tailwind CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -25,261 +23,168 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        select option {
-            background: #111827;
-            color: #fff;
-        }
-        .custom-table-scrollbar::-webkit-scrollbar { height: 6px; }
-        .custom-table-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-table-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="min-h-screen flex bg-[#060814] overflow-x-hidden">
 
-    <!-- Sidebar Layout Module Linkage -->
-    <aside id="sidebar" class="w-64 glass-card h-full flex flex-col transition-all duration-300 absolute z-50 md:relative md:translate-x-0 -translate-x-full">
-        <div class="p-6 flex items-center gap-3 border-b border-white/5">
-            <div class="w-10 h-10 yono-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <i class="fa-solid fa-building-columns text-white text-lg"></i>
+    <aside id="sidebar" class="w-64 glass-card border-r border-white/5 fixed inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between p-4 m-0 lg:m-3 lg:rounded-2xl lg:h-[calc(100vh-24px)]">
+        <div>
+            <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
+                <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md shadow-purple-500/20">VP</div>
+                <div>
+                    <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
+                    <p class="text-[10px] text-purple-400 font-medium">SBI Luxury Pro 2026</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-white font-bold text-lg leading-tight">VP MICRO</h1>
-                <p class="text-[10px] text-purple-400 uppercase tracking-widest">PRO 2026</p>
-            </div>
-            <button onclick="toggleSidebar()" class="md:hidden ml-auto text-slate-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
+
+            <nav class="space-y-1">
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
+                    <i class="fa-solid fa-chart-pie text-sm group-hover:text-purple-400 transition-colors"></i> Executive Dashboard
+                </a>
+                <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
+                    <i class="fa-solid fa-user-plus text-sm group-hover:text-purple-400 transition-colors"></i> Capital Disbursement
+                </a>
+                <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium transition-all shadow-md shadow-purple-950/20">
+                    <i class="fa-solid fa-address-book text-sm"></i> Customer Ledger
+                </a>
+                <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all hover:bg-white/5 group">
+                    <i class="fa-solid fa-money-bill-transfer text-sm group-hover:text-purple-400 transition-colors"></i> EMI Post Credit
+                </a>
+            </nav>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            <p class="text-xs text-slate-500 font-semibold px-3 mb-2 uppercase tracking-wider">Main Menu</p>
-            <a href="index.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-border-all w-5 text-center"></i>
-                <span class="text-sm font-medium">Dashboard</span>
-            </a>
-            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-user-plus w-5 text-center"></i>
-                <span class="text-sm font-medium">Add Customer</span>
-            </a>
-            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-3 yono-gradient text-white rounded-xl shadow-md">
-                <i class="fa-solid fa-users w-5 text-center"></i>
-                <span class="text-sm font-medium">Customer List</span>
-            </a>
-            <a href="transaction.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-wallet w-5 text-center"></i>
-                <span class="text-sm font-medium">Transactions</span>
-            </a>
-        </nav>
-        <div class="p-4 border-t border-white/5">
-            <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all">
-                <i class="fa-solid fa-power-off w-5 text-center"></i>
-                <span class="text-sm font-medium">Secure Logout</span>
+
+        <div class="p-2 border-t border-white/5 pt-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs"><i class="fa-solid fa-user-shield text-slate-300"></i></div>
+                <div>
+                    <p class="text-[11px] font-medium text-slate-200">Admin Account</p>
+                    <span class="text-[9px] text-emerald-400 font-mono block flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Node Active</span>
+                </div>
+            </div>
+            <a href="login.html" class="w-full py-2 bg-white/5 hover:bg-rose-950/20 hover:text-rose-400 border border-white/5 rounded-xl text-[11px] font-medium transition-all text-center block text-slate-400">
+                <i class="fa-solid fa-power-off mr-1.5 text-[10px]"></i> Secure Sign Out
             </a>
         </div>
     </aside>
 
-    <!-- Content Workspace -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        <!-- Dashboard Subheader Header -->
-        <header class="glass-card h-20 px-6 flex items-center justify-between z-10 sticky top-0">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-300 hover:text-white p-2 rounded-lg bg-white/5">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <h2 class="text-xl font-semibold text-white">Active Database Registry</h2>
+    <main class="flex-1 min-w-0 lg:pl-72 p-4 lg:p-6 transition-all duration-300">
+        
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="lg:hidden w-9 h-9 glass-card rounded-xl flex items-center justify-center text-slate-300 border border-white/5"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <h2 class="text-base font-semibold text-white tracking-tight">Active Customer Ledger</h2>
+                    <p class="text-xs text-slate-400 hidden sm:block">Live synchronization pipeline audit data matrix.</p>
+                </div>
             </div>
-            <button onclick="fetchLatestCustomerMaster()" class="p-2.5 bg-white/5 hover:bg-white/10 text-purple-400 rounded-xl transition-all flex items-center gap-2 text-xs font-medium border border-white/5">
-                <i class="fa-solid fa-rotate-right"></i> Refresh Node
-            </button>
         </header>
 
-        <!-- Main Workspace Scroll Panel -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
-            
-            <!-- Filters Control Dashboard Block -->
-            <div class="glass-card p-4 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Text Search Control -->
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                    <input type="text" id="tableSearch" oninput="executeTableFiltering()" placeholder="Search Name, Account ID..." class="w-full pl-9 pr-4 py-2 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500">
-                </div>
-
-                <!-- Structural Frequency Dropdown Filter -->
-                <div>
-                    <select id="filterFrequency" onchange="executeTableFiltering()" class="w-full px-4 py-2 bg-white/5 border border-slate-700 rounded-xl text-slate-300 text-sm focus:outline-none focus:border-purple-500">
-                        <option value="ALL">All Loan Frequencies</option>
-                        <option value="Daily">Daily Installments</option>
-                        <option value="Weekly">Weekly Installments</option>
-                        <option value="Monthly">Monthly Installments</option>
-                    </select>
-                </div>
-
-                <!-- Metric Summary Counter Flag -->
-                <div class="flex items-center justify-end px-2 text-xs text-slate-400">
-                    Showing <span id="recordCount" class="font-bold text-purple-400 mx-1">0</span> structural profiles matched
-                </div>
+        <div class="glass-card border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="p-4 bg-white/[0.02] border-b border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider"><i class="fa-solid fa-database mr-1.5"></i> Live Ledger Profiles</span>
+                <span id="syncStatusBadge" class="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-medium bg-amber-950/40 text-amber-400 border border-amber-500/20"><i class="fa-solid fa-circle-notch animate-spin mr-1"></i> Syncing Node Cache...</span>
             </div>
 
-            <!-- Ledger Table Frame Layer -->
-            <div class="glass-card rounded-2xl overflow-hidden border border-white/5 flex flex-col">
-                <div class="overflow-x-auto custom-table-scrollbar">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-white/5 border-b border-white/10 text-slate-400 text-xs font-semibold uppercase tracking-wider select-none">
-                                <th class="p-4">Account Ref</th>
-                                <th class="p-4">Customer Details</th>
-                                <th class="p-4">Principal (₹)</th>
-                                <th class="p-4">Frequency</th>
-                                <th class="p-4">EMI Installment</th>
-                                <th class="p-4">Outstanding Bal</th>
-                                <th class="p-4 text-center">Action Parameters</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customerTableBody" class="divide-y divide-white/5 text-sm text-slate-300">
-                            <!-- Loader Shell -->
-                            <tr>
-                                <td colspan="7" class="p-12 text-center text-slate-500">
-                                    <i class="fa-solid fa-circle-nodes animate-spin text-2xl mb-2 text-purple-500 block"></i>
-                                    Initializing connection parameters to registry array...
-                                </td>
-                            </tr>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-white/5 bg-white/[0.01]">
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">CLAN ID</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Customer Name</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Mobile Terminal</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Principal</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Frequency</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Calculated EMI</th>
+                            <th class="p-4 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Outstanding</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTableBody" class="divide-y divide-white/5 text-xs">
                         </tbody>
-                    </table>
-                </div>
-
-                <!-- Footer Pagination Control Layout Elements -->
-                <div class="p-4 border-t border-white/5 bg-white/[0.01] flex items-center justify-between text-xs text-slate-400">
-                    <button class="px-3 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 transition-all" disabled>Previous</button>
-                    <span>Page <strong class="text-white">1</strong> of 1</span>
-                    <button class="px-3 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 transition-all" disabled>Next</button>
-                </div>
+                </table>
             </div>
-
         </div>
     </main>
 
-    <!-- Local Runtime Interfacing Scripts -->
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        // Mock Array for isolated system UI component visual inspection stages
-        let localRegistryArray = [
-            { accountNo: 'VP-903120', customerName: 'Muthu Kumar', mobile: '9876543210', principal: 40000, frequency: 'Monthly', emi: 4500, totalOutstanding: 45000 },
-            { accountNo: 'VP-431092', customerName: 'Anitha Raj', mobile: '9012345678', principal: 15000, frequency: 'Daily', emi: 200, totalOutstanding: 16400 },
-            { accountNo: 'VP-882103', customerName: 'Selvam S.', mobile: '8123456789', principal: 60000, frequency: 'Weekly', emi: 1500, totalOutstanding: 66000 }
-        ];
+        const CORE_FETCH_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderCustomerRegistryMatrix(localRegistryArray);
+            renderMasterLedgerGridData();
         });
 
-        function renderCustomerRegistryMatrix(dataset) {
+        function renderMasterLedgerGridData() {
             const tbody = document.getElementById('customerTableBody');
-            const countLabel = document.getElementById('recordCount');
+            const badge = document.getElementById('syncStatusBadge');
             tbody.innerHTML = '';
-            
-            if(dataset.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">No profile signatures aligned to active constraints.</td></tr>`;
-                countLabel.innerText = '0';
-                return;
+
+            // Step 1: Load and prioritize immediate Local Buffer records (Instant data representation)
+            let rawBufferData = localStorage.getItem('vp_local_customers');
+            let combinedLedger = [];
+
+            if (rawBufferData) {
+                try {
+                    combinedLedger = JSON.parse(rawBufferData);
+                } catch(e) {
+                    console.error("Buffer decode mismatch:", e);
+                }
             }
 
-            dataset.forEach(profile => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-white/[0.02] transition-colors';
-                tr.innerHTML = `
-                    <td class="p-4 font-mono font-bold text-purple-400">${profile.accountNo}</td>
-                    <td class="p-4">
-                        <div class="text-white font-medium">${profile.customerName}</div>
-                        <div class="text-[11px] text-slate-500"><i class="fa-solid fa-phone text-[9px]"></i> ${profile.mobile}</div>
-                    </td>
-                    <td class="p-4 font-medium">₹${profile.principal.toLocaleString('en-IN')}</td>
-                    <td class="p-4">
-                        <span class="px-2 py-0.5 text-[11px] font-medium rounded-full ${
-                            profile.frequency === 'Daily' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                            profile.frequency === 'Weekly' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                            'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                        }">${profile.frequency}</span>
-                    </td>
-                    <td class="p-4 font-medium text-emerald-400">₹${profile.emi.toLocaleString('en-IN')}</td>
-                    <td class="p-4 font-medium text-slate-200">₹${profile.totalOutstanding.toLocaleString('en-IN')}</td>
-                    <td class="p-4 text-center">
-<div class="flex items-center justify-center gap-2">
-    <button onclick="viewCustomerProfile('${profile.accountNo}')" class="p-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-xs transition-colors" title="View Profile"><i class="fa-regular fa-eye"></i></button>
-    <button onclick="editCustomerProfile('${profile.accountNo}')" class="p-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg text-xs transition-colors" title="Modify"><i class="fa-regular fa-pen-to-square"></i></button>
-    <button onclick="deleteCustomerRecord('${profile.accountNo}')" class="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-xs transition-colors" title="Purge Record"><i class="fa-regular fa-trash-can"></i></button>
-</div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            countLabel.innerText = dataset.length;
-        }
+            // Fallback Seed Data array layers mapping if absolutely empty
+            if (combinedLedger.length === 0) {
+                combinedLedger = [
+                    { accountNo: 'VP-900001', customerName: 'Muthu Kumar', mobile: '9876543210', principal: 40000, frequency: 'Monthly', emi: 3750, totalOutstanding: 45000 },
+                    { accountNo: 'VP-900002', customerName: 'Anitha Raj', mobile: '8765432109', principal: 15000, frequency: 'Weekly', emi: 315, totalOutstanding: 16400 }
+                ];
+            }
 
-        function executeTableFiltering() {
-            const query = document.getElementById('tableSearch').value.toLowerCase();
-            const freq = document.getElementById('filterFrequency').value;
+            // Function framework to loop and render row entries into Viewport Table
+            function renderRowsToTable(dataset) {
+                tbody.innerHTML = '';
+                if(dataset.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-medium">No customer profiles active within matrix ledger pipeline limits.</td></tr>`;
+                    return;
+                }
+                
+                dataset.forEach(profile => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-white/[0.02] transition-colors group";
+                    row.innerHTML = `
+                        <td class="p-4 font-mono font-semibold text-purple-400 tracking-wide">${profile.accountNo || 'VP-N/A'}</td>
+                        <td class="p-4 font-medium text-slate-200 group-hover:text-white transition-colors">${profile.customerName || 'N/A'}</td>
+                        <td class="p-4 font-mono text-slate-400">${profile.mobile || 'N/A'}</td>
+                        <td class="p-4 text-slate-300 font-medium">₹${(parseFloat(profile.principal) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-medium ${profile.frequency === 'Daily' ? 'bg-amber-950/50 text-amber-400 border border-amber-500/20' : profile.frequency === 'Weekly' ? 'bg-blue-950/50 text-blue-400 border border-blue-500/20' : 'bg-purple-950/50 text-purple-400 border border-purple-500/20'}">${profile.frequency || 'Monthly'}</span></td>
+                        <td class="p-4 text-emerald-400 font-mono font-semibold">₹${(parseFloat(profile.emi) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4 text-amber-400 font-mono font-bold">₹${(parseFloat(profile.totalOutstanding) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
 
-            const structuredSet = localRegistryArray.filter(item => {
-                const matchQuery = item.customerName.toLowerCase().includes(query) || item.accountNo.toLowerCase().includes(query);
-                const matchFreq = (freq === 'ALL' || item.frequency === freq);
-                return matchQuery && matchFreq;
-            });
-            
-            renderCustomerRegistryMatrix(structuredSet);
-        }
+            // Render local data instantly
+            renderRowsToTable(combinedLedger);
+            badge.className = "px-2.5 py-0.5 rounded-full text-[9px] font-mono font-medium bg-emerald-950/40 text-emerald-400 border border-emerald-500/20";
+            badge.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Data Node Buffer Synced`;
 
-        function fetchLatestCustomerMaster() {
-            alert('Machi, operational pipeline ready! This trigger will perform an asynchronous pull straight from the spreadsheet array once customer.js logic handles data routing bindings.');
+            // Step 2: Live Remote Spreadsheet Pipeline Handshake Async Fetch Check
+            if (CORE_FETCH_URL && !CORE_FETCH_URL.includes("YOUR_APPS_SCRIPT")) {
+                fetch(`${CORE_FETCH_URL}?action=getCustomers`)
+                .then(res => res.json())
+                .then(cloudPayload => {
+                    if(cloudPayload && cloudPayload.status === 'success' && Array.isArray(cloudPayload.data)) {
+                        // Merge cloud data over local structural simulation cache layers if active
+                        renderRowsToTable(cloudPayload.data);
+                    }
+                })
+                .catch(err => {
+                    console.warn("Cloud live payload sync delayed, keeping local cached layer views:", err);
+                });
+            }
         }
     </script>
-
-<!-- Premium Luxury Modal for View / Edit Actions -->
-    <div id="actionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative border border-white/10">
-            <!-- Modal Header -->
-            <div class="flex justify-between items-center border-b border-white/5 pb-4 mb-4">
-                <h3 id="modalTitle" class="text-lg font-semibold text-white">Customer Account Actions</h3>
-                <button onclick="closeActionModal()" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-            
-            <!-- Modal Form Body -->
-            <form id="modalForm" onsubmit="handleModalSubmit(event)" class="space-y-4">
-                <input type="hidden" id="modalAccountNo">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1 uppercase">Customer Name</label>
-                        <input type="text" id="modalName" required class="w-full px-3 py-2 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1 uppercase">Mobile Line</label>
-                        <input type="tel" id="modalMobile" required pattern="[0-9]{10}" class="w-full px-3 py-2 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1 uppercase">Principal Amount (₹)</label>
-                        <input type="number" id="modalPrincipal" required class="w-full px-3 py-2 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1 uppercase">EMI Installment (₹)</label>
-                        <input type="number" id="modalEMI" required class="w-full px-3 py-2 bg-white/5 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 text-sm">
-                    </div>
-                </div>
-
-                <!-- Action Footer Buttons -->
-                <div class="flex justify-end gap-3 border-t border-white/5 pt-4 mt-6" id="modalActionButtons">
-                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all">Cancel</button>
-                    <button type="submit" id="modalSubmitBtn" class="px-5 py-2 yono-gradient text-white rounded-xl text-xs font-medium shadow-md transition-all">Update Balance</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Link the Actions logic engine below your customer.js or local runtime script -->
-    <script src="customer-actions.js"></script>
-
 </body>
 </html>
