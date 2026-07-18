@@ -1,71 +1,77 @@
-// Unga kotha Apps Script Deployment URL-ai inga paste pannunga machi!
+/**
+ * VP MICROFINANCE PRO 2026
+ * Core Customer Operations & Math Engine (customer.js)
+ */
+
 const GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Math listener engine dynamic triggers setup
+    // 1. Setup real-time calculations event listeners
     const inputIds = ['principal', 'interestRate', 'frequency', 'duration', 'startDate'];
     inputIds.forEach(id => {
-        const inputNode = document.getElementById(id);
-        if (inputNode) {
-            inputNode.addEventListener('input', executeLiveFinancialEngine);
-            inputNode.addEventListener('change', executeLiveFinancialEngine);
+        const node = document.getElementById(id);
+        if (node) {
+            node.addEventListener('input', runLiveMicrofinanceCalculator);
+            node.addEventListener('change', runLiveMicrofinanceCalculator);
         }
     });
 
-    // Generate functional automated tracking sequential id
-    generateAutomatedCLAN();
+    // 2. Automated Sequential Tracking AC Number Execution
+    initializeTrackingAccountNumber();
 
-    // Default current time baseline date
+    // 3. Set default dynamic baseline date
     const startField = document.getElementById('startDate');
     if (startField && !startField.value) {
         startField.value = new Date().toISOString().split('T')[0];
     }
     
-    executeLiveFinancialEngine();
+    runLiveMicrofinanceCalculator();
 });
 
-function generateAutomatedCLAN() {
-    const acNode = document.getElementById('accountNo');
-    if (acNode) {
-        let currentSeed = localStorage.getItem('vp_clan_seed');
-        if (!currentSeed) {
-            currentSeed = 1005; // Starting dynamic benchmark seed row
+function initializeTrackingAccountNumber() {
+    const acField = document.getElementById('accountNo');
+    if (acField) {
+        let lastSeed = localStorage.getItem('vp_clan_seed');
+        if (!lastSeed) {
+            lastSeed = 1005; // Starting index number sequence layout
         }
-        currentSeed = parseInt(currentSeed) + 1;
-        localStorage.setItem('vp_clan_seed', currentSeed);
-        acNode.value = `VP-${currentSeed}`;
+        let nextSeed = parseInt(lastSeed) + 1;
+        localStorage.setItem('vp_clan_seed', nextSeed);
+        acField.value = `VP-${nextSeed}`;
     }
 }
 
-function executeLiveFinancialEngine() {
+function runLiveMicrofinanceCalculator() {
     const principal = parseFloat(document.getElementById('principal').value) || 0;
-    const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+    const rate = parseFloat(document.getElementById('interestRate').value) || 0; // Fixed key property selection mapping
     const duration = parseInt(document.getElementById('duration').value) || 0;
     const frequency = document.getElementById('frequency').value;
-    const startDate = document.getElementById('startDate').value;
+    const startDateVal = document.getElementById('startDate').value;
 
-    if (principal <= 0 || rate <= 0 || duration <= 0) return;
+    if (principal <= 0 || rate <= 0 || duration <= 0) {
+        return;
+    }
 
-    // Financial calculations matrix
-    const computedInterest = principal * (rate / 100) * (duration / 12);
-    const totalRepayable = principal + computedInterest;
+    // Core Interest Equation Calculations
+    const calculatedInterest = principal * (rate / 100) * (duration / 12);
+    const totalRepayable = principal + calculatedInterest;
 
-    let installmentsCount = duration;
-    if (frequency === 'Weekly') installmentsCount = Math.round(duration * 4.34);
-    else if (frequency === 'Daily') installmentsCount = duration * 30;
+    let totalInstallments = duration;
+    if (frequency === 'Weekly') totalInstallments = Math.round(duration * 4.34);
+    else if (frequency === 'Daily') totalInstallments = duration * 30;
 
-    const finalEmi = installmentsCount > 0 ? totalRepayable / installmentsCount : 0;
+    const preciseEmi = totalInstallments > 0 ? totalRepayable / totalInstallments : 0;
 
-    // DOM UI Injection
-    document.getElementById('lblTotalInterest').innerText = `₹${computedInterest.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
-    document.getElementById('lblTotalRepayable').innerText = `₹${totalRepayable.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
-    document.getElementById('lblEMI').innerText = `₹${finalEmi.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+    // Push calculation metrics smoothly back to UI elements
+    document.getElementById('lblTotalInterest').innerText = `₹${calculatedInterest.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('lblTotalRepayable').innerText = `₹${totalRepayable.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('lblEMI').innerText = `₹${preciseEmi.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
-    // Automated End Date Computation
-    if (startDate) {
-        const calculatedDate = new Date(startDate);
-        calculatedDate.setMonth(calculatedDate.getMonth() + duration);
-        document.getElementById('endDate').value = calculatedDate.toISOString().split('T')[0];
+    // Compute Automated Maturity End Date
+    if (startDateVal) {
+        const start = new Date(startDateVal);
+        start.setMonth(start.getMonth() + duration);
+        document.getElementById('endDate').value = start.toISOString().split('T')[0];
     }
 }
 
@@ -87,30 +93,30 @@ function saveCustomerDataToServerPipeline() {
     };
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Sending Data to Cloud...`;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Dispatching to Cloud Server...`;
 
-    // Local Storage dynamic fallback synchronization matrix layout array push
+    // Local Storage dynamic fallback cache injection protocol
     let localLedger = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
     localLedger.unshift(customerPayload);
     localStorage.setItem('vp_local_customers', JSON.stringify(localLedger));
 
-    // GET query request payload configuration architecture rules
-    const targetUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
+    // URLSearchParams Method parsing format targeting deployment setup
+    const finalEndpointUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
 
-    fetch(targetUrl, {
+    fetch(finalEndpointUrl, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache'
     })
     .then(res => res.json())
     .then(result => {
-        if(result && result.status === 'success') {
-            alert('🎉 Perfect Machi! Data accurately recorded in Google Sheets Database!');
+        if (result && result.status === 'success') {
+            alert('🎉 Success Machi! Ledger account perfectly pushed to Google Sheets!');
         }
         window.location.href = "customer-list.html";
     })
     .catch(err => {
-        console.warn("Bypassed server check parameters node direct route integration:", err);
+        console.warn("Server response active status routing bypass:", err);
         window.location.href = "customer-list.html";
     });
 }
