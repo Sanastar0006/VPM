@@ -122,7 +122,7 @@
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        // 1. Core Dynamic Grid Renderer
+        // 1. Core Dynamic Grid Renderer (Now includes Delete Button Elements)
         function renderActiveLedgerGrid() {
             const tableBody = document.getElementById('customerTableBody');
             if (!tableBody) return;
@@ -153,6 +153,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 <button onclick="viewProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-purple-600/20 transition-all" title="View Profile"><i class="fa-solid fa-eye text-[11px]"></i></button>
                                 <button onclick="editProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-amber-600/20 transition-all" title="Edit Properties"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                                <button onclick="deleteCustomerProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-rose-400 rounded-lg hover:text-white hover:bg-rose-600/20 transition-all" title="Delete Profile"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -186,6 +187,34 @@
             document.getElementById('actionModal').classList.remove('hidden');
         }
 
+        // 4. Dynamic Delete Protocol Integration
+        function deleteCustomerProfile(accountNo) {
+            if (!confirm(`⚠️ Machi, Warning!\nAre you sure you want to delete account: ${accountNo}? This cannot be undone.`)) {
+                return;
+            }
+
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            let filteredCustomers = customers.filter(c => c.accountNo !== accountNo);
+            
+            // Local Cache Cleanup
+            localStorage.setItem('vp_local_customers', JSON.stringify(filteredCustomers));
+            renderActiveLedgerGrid();
+
+            // Cloud sheet deletion pipeline broadcast handshake
+            const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ 
+                action: 'deleteCustomer', 
+                accountNo: accountNo 
+            }))}`;
+
+            fetch(syncEndpoint, { method: 'GET', mode: 'cors' })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.status === 'success') console.log("Cloud log entry deleted!");
+            }).catch(err => console.warn("Cloud bypass active:", err));
+
+            alert('🗑️ Clear ah tuple space-la erundhu account details-ah uriviyachu machi! Process Done!');
+        }
+
         // Helper Data Population Core Tools
         function populateModalData(data) {
             document.getElementById('modalAccountNo').value = data.accountNo || '';
@@ -206,7 +235,7 @@
             document.getElementById('actionModal').classList.add('hidden');
         }
 
-        // 4. Update Pipeline & Local Cache Sync Action
+        // 5. Update Pipeline & Local Cache Sync Action
         function saveUpdatedCustomerData(e) {
             e.preventDefault();
             let targetAc = document.getElementById('modalAccountNo').value;
