@@ -3,261 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMI Collections | VP MICROFINANCE PRO 2026</title>
-    <!-- Fonts & Tailwind CSS -->
+    <title>Collection Entry Pipeline | VP MICROFINANCE PRO 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #0b0f19;
-            color: #e2e8f0;
-        }
-        .yono-gradient {
-            background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        select option {
-            background: #111827;
-            color: #fff;
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        body { font-family: 'Poppins', sans-serif; background: #0b0f19; color: #e2e8f0; }
+        .yono-gradient { background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .custom-dropdown::-webkit-scrollbar { width: 4px; }
+        .custom-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="min-h-screen bg-[#060814] text-slate-100 flex">
 
-    <!-- Sidebar Layout Module Linkage -->
-    <aside id="sidebar" class="w-64 glass-card h-full flex flex-col transition-all duration-300 absolute z-50 md:relative md:translate-x-0 -translate-x-full">
-        <div class="p-6 flex items-center gap-3 border-b border-white/5">
-            <div class="w-10 h-10 yono-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <i class="fa-solid fa-building-columns text-white text-lg"></i>
-            </div>
+    <aside id="sidebar" class="w-64 glass-card fixed inset-y-0 left-0 z-50 p-4 m-3 rounded-2xl h-[calc(100vh-24px)] transition-transform duration-300 lg:translate-x-0 -translate-x-full lg:static">
+        <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
+            <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md">VP</div>
             <div>
-                <h1 class="text-white font-bold text-lg leading-tight">VP MICRO</h1>
-                <p class="text-[10px] text-purple-400 uppercase tracking-widest">PRO 2026</p>
+                <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
+                <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
             </div>
-            <button onclick="toggleSidebar()" class="md:hidden ml-auto text-slate-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-            <p class="text-xs text-slate-500 font-semibold px-3 mb-2 uppercase tracking-wider">Main Menu</p>
-            <a href="index.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-border-all w-5 text-center"></i>
-                <span class="text-sm font-medium">Dashboard</span>
+        <nav class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
+                <i class="fa-solid fa-chart-pie group-hover:text-purple-400"></i> Dashboard Matrix
             </a>
-            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-user-plus w-5 text-center"></i>
-                <span class="text-sm font-medium">Add Customer</span>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
+                <i class="fa-solid fa-user-plus group-hover:text-purple-400"></i> Capital Disbursement
             </a>
-            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
-                <i class="fa-solid fa-users w-5 text-center"></i>
-                <span class="text-sm font-medium">Customer List</span>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
+                <i class="fa-solid fa-address-book"></i> Customer Ledger
             </a>
-            <a href="transaction.html" class="flex items-center gap-3 px-3 py-3 yono-gradient text-white rounded-xl shadow-md">
-                <i class="fa-solid fa-wallet w-5 text-center"></i>
-                <span class="text-sm font-medium">Transactions</span>
+            <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all">
+                <i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal
             </a>
         </nav>
-        <div class="p-4 border-t border-white/5">
-            <a href="login.html" class="flex items-center gap-3 px-3 py-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-all">
-                <i class="fa-solid fa-power-off w-5 text-center"></i>
-                <span class="text-sm font-medium">Secure Logout</span>
-            </a>
-        </div>
     </aside>
 
-    <!-- Content Workspace -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        <header class="glass-card h-20 px-6 flex items-center justify-between z-10 sticky top-0">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-300 hover:text-white p-2 rounded-lg bg-white/5">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <h2 class="text-xl font-semibold text-white">EMI Collection Terminal</h2>
+    <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
+        <header class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebarLayout()" class="lg:hidden p-2 text-slate-400 hover:text-white glass-card rounded-xl text-xs"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <h2 class="text-base font-semibold text-white tracking-wide">Dynamic Transaction Interface</h2>
+                    <p class="text-xs text-slate-400">Real-time ledger handshake pipeline protocols.</p>
+                </div>
             </div>
         </header>
 
-        <!-- Main Workspace Panels Split Layout -->
-        <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 custom-scrollbar">
-            
-            <!-- Left Side: Collection Entry Input Form Box -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="glass-card p-6 rounded-3xl border border-white/5">
-                    <h3 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-cash-register text-purple-400"></i> Post New Payment
-                    </h3>
-                    
-                    <form id="paymentForm" onsubmit="executeTransactionProcessing(event)" class="space-y-4">
-                        <!-- Account Lookup Entry -->
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Account Number</label>
-                            <div class="relative">
-                                <i class="fa-solid fa-fingerprint absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                                <input type="text" id="txAccountNo" required onblur="fetchProfileSnapshotMetrics()" placeholder="e.g., VP-1001" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500 transition-all font-mono uppercase">
-                            </div>
-                        </div>
-
-                        <!-- Real-Time Customer Verification Card Block -->
-                        <div id="accountVerificationCard" class="hidden p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs space-y-1">
-                            <div class="text-emerald-400 font-semibold flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-check"></i> Profile Aligned
-                            </div>
-                            <div class="text-slate-300">Name: <span id="snapshotName" class="font-medium text-white">-</span></div>
-                            <div class="text-slate-300">Base EMI: <span id="snapshotEMI" class="font-medium text-white">-</span></div>
-                        </div>
-
-                        <!-- Amount Collected Entry -->
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Amount Paid (₹)</label>
-                            <div class="relative">
-                                <i class="fa-solid fa-indian-rupee-sign absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-                                <input type="number" id="txAmount" required min="1" placeholder="0.00" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500 transition-all font-semibold">
-                            </div>
-                        </div>
-
-                        <!-- Payment Routing System Modes Dropdown -->
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Payment Mode</label>
-                            <select id="txMethod" class="w-full px-3 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-slate-300 text-sm focus:outline-none focus:border-purple-500 transition-all">
-                                <option value="Cash">Physical Currency (Cash)</option>
-                                <option value="UPI">Digital Unified Interface (UPI)</option>
-                                <option value="Bank Transfer">Direct NetBanking Transfer</option>
-                            </select>
-                        </div>
-
-                        <!-- Collection Agent Identity Input -->
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Collected By</label>
-                            <input type="text" id="txAgent" required placeholder="Agent/Admin Name" class="w-full px-4 py-2.5 bg-white/5 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-500 transition-all">
-                        </div>
-
-                        <button type="submit" id="txSubmitBtn" class="w-full py-3 mt-2 yono-gradient text-white font-medium rounded-xl text-sm shadow-lg shadow-purple-900/20 hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-vault"></i> Secure Post Transaction
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Right Side: Live Auditing Stream Ledger List Layout -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="glass-card p-6 rounded-3xl border border-white/5 flex flex-col h-full min-h-[500px]">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-base font-semibold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-clock-history text-purple-400"></i> Audit Stream Ledger
-                        </h3>
-                        <span class="text-[11px] px-2.5 py-1 bg-white/5 rounded-lg border border-white/5 text-slate-400">Live Continuous Updates</span>
+        <div class="w-full max-w-2xl glass-card rounded-2xl border border-white/5 p-6 shadow-2xl mx-auto">
+            <form id="transactionForm" onsubmit="executeTransactionCommit(event)" class="space-y-5">
+                
+                <div class="relative">
+                    <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Search Account Number</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" id="searchAccount" autocomplete="off" oninput="triggerAccountSearchPipeline()" placeholder="Type VP-102... to search account ledger" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
                     </div>
+                    <div id="searchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown">
+                        </div>
+                </div>
 
-                    <div class="overflow-x-auto flex-1 custom-scrollbar">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-white/5 border-b border-white/10 text-slate-400 text-xs font-semibold uppercase tracking-wider select-none">
-                                    <th class="p-3">TX ID</th>
-                                    <th class="p-3">Acc Ref</th>
-                                    <th class="p-3">Date Path</th>
-                                    <th class="p-3">Type</th>
-                                    <th class="p-3 text-right">Credit Value</th>
-                                    <th class="p-3">Collector</th>
-                                </tr>
-                            </thead>
-                            <tbody id="txHistoryTableBody" class="divide-y divide-white/5 text-xs text-slate-300">
-                                <!-- Dynamic transactions fall here -->
-                            </tbody>
-                        </table>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">Customer Legal Identity</label>
+                        <input type="text" id="customerName" readonly placeholder="Auto-populated Name" class="w-full px-3 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl text-slate-400 text-xs font-medium focus:outline-none cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">Disbursed Loan Principal</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">₹</span>
+                            <input type="text" id="loanAmount" readonly placeholder="0.00" class="w-full pl-7 pr-3 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl text-slate-400 font-mono text-xs focus:outline-none cursor-not-allowed">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-    </main>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">Target EMI Valuation</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-500 text-xs">₹</span>
+                            <input type="text" id="emiAmount" readonly placeholder="0.00" class="w-full pl-7 pr-3 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl text-emerald-400 font-mono font-bold text-xs focus:outline-none cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">Scheduled EMI Repayment Date</label>
+                        <input type="text" id="emiDate" readonly placeholder="YYYY-MM-DD" class="w-full px-3 py-2.5 bg-white/[0.02] border border-white/5 rounded-xl text-slate-400 text-xs font-medium focus:outline-none cursor-not-allowed">
+                    </div>
+                </div>
 
-    <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        }
-
-        // Mock Datastream values for local template evaluation stages
-        let mockTransactions = [
-            { txId: 'TXN-773012', accountNo: 'VP-1001', date: '2026-07-15', method: 'UPI', amount: 1500, agent: 'Admin Node' },
-            { txId: 'TXN-119402', accountNo: 'VP-1003', date: '2026-07-16', method: 'Cash', amount: 200, agent: 'Selva Kumar' }
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTransactionLogs(mockTransactions);
-        });
-
-        function renderTransactionLogs(dataset) {
-            const tbody = document.getElementById('txHistoryTableBody');
-            tbody.innerHTML = '';
-
-            if(dataset.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No active transactions cached on this operational shift node.</td></tr>`;
-                return;
-            }
-
-            dataset.forEach(tx => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-white/[0.01] transition-colors';
-                tr.innerHTML = `
-                    <td class="p-3 font-mono font-medium text-slate-400">${tx.txId}</td>
-                    <td class="p-3 font-mono text-purple-400 font-bold">${tx.accountNo}</td>
-                    <td class="p-3 text-slate-400">${tx.date}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-medium ${
-                            tx.method === 'Cash' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        }">${tx.method}</span>
-                    </td>
-                    <td class="p-3 text-right font-bold text-emerald-400">₹${tx.amount.toLocaleString('en-IN')}</td>
-                    <td class="p-3 text-slate-400"><i class="fa-regular fa-user text-[10px] mr-1"></i>${tx.agent}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function fetchProfileSnapshotMetrics() {
-            const inputAcc = document.getElementById('txAccountNo').value.toUpperCase().trim();
-            const alertCard = document.getElementById('accountVerificationCard');
-            
-            if(inputAcc === 'VP-1001' || inputAcc === 'VP-1003') {
-                document.getElementById('snapshotName').innerText = inputAcc === 'VP-1001' ? 'Muthu Kumar' : 'Selvam S.';
-                document.getElementById('snapshotEMI').innerText = inputAcc === 'VP-1001' ? '₹4,500' : '₹1,500';
-                alertCard.classList.remove('hidden');
-            } else {
-                alertCard.classList.add('hidden');
-            }
-        }
-
-        function executeTransactionProcessing(event) {
-            event.preventDefault();
-            
-            const generatedTxId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
-            const newTx = {
-                txId: generatedTxId,
-                accountNo: document.getElementById('txAccountNo').value.toUpperCase(),
-                date: new Date().toISOString().split('T')[0],
-                method: document.getElementById('txMethod').value,
-                amount: parseFloat(document.getElementById('txAmount').value),
-                agent: document.getElementById('txAgent').value
-            };
-
-            mockTransactions.unshift(newTx); // Top of standard list array queue stack
-            renderTransactionLogs(mockTransactions);
-            
-            alert(`🎉 Success Machi! Posted Transaction Entry Reference: ${generatedTxId}`);
-            document.getElementById('paymentForm').reset();
-            document.getElementById('accountVerificationCard').classList.add('hidden');
-        }
-    </script>
-</body>
-</html>
+                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                    <div>
+                        <label class="block text-[10px] text-amber-400 font-semibold mb-1 uppercase tracking-wider">Payment Mode Channel</label>
+                        <select id="paymentMode" required class="w-full px-3 py-2.5 bg
