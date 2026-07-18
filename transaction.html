@@ -60,9 +60,9 @@
                     <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Search Account Number</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" id="searchAccount" autocomplete="off" oninput="triggerAccountSearchPipeline()" placeholder="Type VP-102... to search account ledger" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
+                        <input type="text" id="searchAccount" autocomplete="off" oninput="triggerAccountSearchPipeline()" placeholder="Type to search (e.g., VP-102...)" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
                     </div>
-                    <div id="searchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown">
+                    <div id="searchDropdown" class="absolute Skinner z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown">
                         </div>
                 </div>
 
@@ -97,4 +97,162 @@
                 <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
                     <div>
                         <label class="block text-[10px] text-amber-400 font-semibold mb-1 uppercase tracking-wider">Payment Mode Channel</label>
-                        <select id="paymentMode" required class="w-full px-3 py-2.5 bg
+                        <select id="paymentMode" required class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
+                            <option value="" disabled selected>Select Channel</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Split Payment">Split Payment</option>
+                            <option value="NEFT or IMPS">NEFT or IMPS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-amber-400 font-semibold mb-1 uppercase tracking-wider">Collected Real Amount (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-white text-xs">₹</span>
+                            <input type="number" step="0.01" id="collectedAmount" required placeholder="Type collected amount" class="w-full pl-7 pr-3 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono font-bold text-xs focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-white/5 pt-4 mt-2">
+                    <button type="reset" onclick="clearTransactionTerminal()" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all">Clear Terminal</button>
+                    <button type="submit" class="px-6 py-2.5 yono-gradient text-white rounded-xl text-xs font-bold tracking-wide shadow-lg hover:opacity-90 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-check-double"></i> Authorize Collection Ledger
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
+
+        function toggleSidebarLayout() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        // 1. Live Incremental Robust Search Match Box Engine
+        function triggerAccountSearchPipeline() {
+            const inputVal = document.getElementById('searchAccount').value.toUpperCase().trim();
+            const dropdown = document.getElementById('searchDropdown');
+            
+            if (!inputVal) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            // Fallback checking to fetch matching keys correctly
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            
+            // Filters data flawlessly even if user types just '102' or 'VP-102'
+            let filtered = customers.filter(c => {
+                let acNo = (c.accountNo || '').toUpperCase();
+                return acNo.includes(inputVal);
+            });
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">Machi, no matching accounts found!</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            dropdown.innerHTML = '';
+            filtered.forEach(account => {
+                let currentName = account.customerName || account.name || 'Unknown Identity';
+                const searchRow = document.createElement('div');
+                searchRow.className = "px-4 py-2.5 hover:bg-purple-600/20 text-xs border-b border-white/5 cursor-pointer flex justify-between items-center transition-all group";
+                searchRow.innerHTML = `
+                    <span class="font-mono font-bold text-purple-400 group-hover:text-white">${account.accountNo}</span>
+                    <span class="text-slate-400 text-[11px] group-hover:text-slate-200">${currentName}</span>
+                `;
+                searchRow.onclick = () => selectTargetAccountProfile(account);
+                dropdown.appendChild(searchRow);
+            });
+
+            dropdown.classList.remove('hidden');
+        }
+
+        // 2. Select and Lock Dropdown Value Mapping Tool (Multi-Property Fallback Engine)
+        function selectTargetAccountProfile(customer) {
+            let correctName = customer.customerName || customer.name || 'N/A';
+            let correctPrincipal = customer.principal || customer.loanAmount || customer.amount || 0;
+            let correctEmi = customer.emi || customer.emiAmount || 0;
+            let correctDate = customer.startDate || customer.date || customer.emiDate || new Date().toISOString().split('T')[0];
+
+            document.getElementById('searchAccount').value = customer.accountNo;
+            document.getElementById('customerName').value = correctName;
+            document.getElementById('loanAmount').value = parseFloat(correctPrincipal).toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('emiAmount').value = parseFloat(correctEmi).toFixed(2);
+            document.getElementById('emiDate').value = correctDate;
+            
+            // Auto-fill input text field validation trigger
+            document.getElementById('collectedAmount').value = parseFloat(correctEmi) || '';
+            
+            // Close dropdown display tray
+            document.getElementById('searchDropdown').classList.add('hidden');
+        }
+
+        // Close dropdown when clicking workspace borders
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('searchDropdown');
+            const searchInput = document.getElementById('searchAccount');
+            if (e.target !== dropdown && e.target !== searchInput) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        function clearTransactionTerminal() {
+            document.getElementById('searchDropdown').classList.add('hidden');
+            document.getElementById('transactionForm').reset();
+        }
+
+        // 3. Authorize Submission and Deduct Balance Flow Logic
+        function executeTransactionCommit(e) {
+            e.preventDefault();
+            
+            const acNo = document.getElementById('searchAccount').value.trim();
+            const name = document.getElementById('customerName').value;
+            const mode = document.getElementById('paymentMode').value;
+            const amt = parseFloat(document.getElementById('collectedAmount').value) || 0;
+
+            if(!name || name === 'Auto-populated Name') {
+                alert("⚠️ Error Machi! Please choose a valid customer account from the dropdown options.");
+                return;
+            }
+
+            // Local cache mutation updates mapping
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            let index = customers.findIndex(c => c.accountNo === acNo);
+
+            if(index !== -1) {
+                let currentOutstanding = parseFloat(customers[index].totalOutstanding || customers[index].outstanding || 0);
+                customers[index].totalOutstanding = Math.max(0, currentOutstanding - amt);
+                localStorage.setItem('vp_local_customers', JSON.stringify(customers));
+            }
+
+            // Package Cloud network stream payload 
+            const payload = {
+                action: 'saveTransaction',
+                data: {
+                    accountNo: acNo,
+                    customerName: name,
+                    paymentMode: mode,
+                    amountCollected: amt,
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            const remoteSyncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify(payload))}`;
+
+            fetch(remoteSyncEndpoint, { method: 'GET', mode: 'cors' })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.status === 'success') console.log("Google Sheets logs committed successfully!");
+            }).catch(err => console.warn("Cloud tracking pipeline standby:", err));
+
+            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} logged successfully!`);
+            clearTransactionTerminal();
+        }
+    </script>
+</body>
+</html>
