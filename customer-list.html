@@ -9,25 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #0b0f19;
-            color: #e2e8f0;
-        }
-        .yono-gradient {
-            background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        /* Custom scrollbar layout styling */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        body { font-family: 'Poppins', sans-serif; background: #0b0f19; color: #e2e8f0; }
+        .yono-gradient { background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
 <body class="min-h-screen bg-[#060814] text-slate-100 flex">
@@ -54,17 +38,15 @@
     </aside>
 
     <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
-        
         <header class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebarLayout()" class="lg:hidden p-2 text-slate-400 hover:text-white glass-card rounded-xl text-xs"><i class="fa-solid fa-bars"></i></button>
                 <div>
-                    <h2 class="text-base font-semibold text-white tracking-wide">VPM_Custromer List</h2>
+                    <h2 class="text-base font-semibold text-white tracking-wide">VPM_ Customer List</h2>
                     <p class="text-xs text-slate-400">Enterprise operational data cache pipelines.</p>
                 </div>
             </div>
-            
-            <button onclick="window.location.href='customer-add.html'" class="px-4 py-2 yono-gradient text-white rounded-xl text-xs font-medium hover:opacity-90 shadow-md transition-all flex items-center gap-2">
+            <button onclick="window.location.href='customer-add.html'" class="px-4 py-2 yono-gradient text-white rounded-xl text-xs font-medium hover:opacity-90 shadow-md flex items-center gap-2">
                 <i class="fa-solid fa-plus text-[10px]"></i> Onboard Account
             </button>
         </header>
@@ -92,13 +74,12 @@
 
     <div id="actionModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 hidden">
         <div class="glass-card w-full max-w-lg rounded-2xl p-6 border border-white/10 shadow-2xl relative">
-            
             <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
                 <h3 id="modalTitle" class="text-xs font-bold tracking-wider uppercase text-purple-400">Registry Workspace</h3>
                 <button onclick="closeActionModal()" class="text-slate-400 hover:text-white text-sm transition-all"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <form id="modalForm" onsubmit="handleModalExecutionPipeline(event)" class="space-y-4">
+            <form id="modalForm" onsubmit="saveUpdatedCustomerData(event)" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-1 uppercase">Account Number ID</label>
@@ -106,24 +87,24 @@
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-1 uppercase">Customer Legal Identity</label>
-                        <input type="text" id="modalName" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                        <input type="text" id="modalName" required class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-1 uppercase">Mobile Connection Terminal</label>
-                        <input type="tel" id="modalMobile" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                        <input type="tel" id="modalMobile" required class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500">
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 mb-1 uppercase">Disbursed Principal (₹)</label>
-                        <input type="number" id="modalPrincipal" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none">
+                        <input type="number" id="modalPrincipal" required class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[10px] text-slate-400 mb-1 uppercase">Calculated Installment Valuation (₹)</label>
-                    <input type="number" id="modalEMI" class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-emerald-400 font-mono font-bold text-xs focus:outline-none">
+                    <input type="number" id="modalEMI" required class="w-full px-3 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-emerald-400 font-mono font-bold text-xs focus:outline-none focus:border-purple-500">
                 </div>
 
                 <div id="modalActionButtons" class="flex justify-end gap-3 border-t border-white/5 pt-4 mt-6">
@@ -134,18 +115,18 @@
         </div>
     </div>
 
-    <script src="customer-actions.js"></script>
     <script>
+        const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
+
         function toggleSidebarLayout() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        // Real-time table render dynamic buffer matrix pipeline execution
+        // 1. Core Dynamic Grid Renderer
         function renderActiveLedgerGrid() {
             const tableBody = document.getElementById('customerTableBody');
             if (!tableBody) return;
 
-            // Load arrays accurately from local structural ledger pipeline
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             tableBody.innerHTML = '';
 
@@ -154,7 +135,7 @@
                 return;
             }
 
-            customers.forEach((user, idx) => {
+            customers.forEach((user) => {
                 const cleanEmi = parseFloat(user.emi) || 0;
                 const cleanOutstanding = parseFloat(user.totalOutstanding) || 0;
 
@@ -170,8 +151,8 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button onclick="viewCustomerProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-purple-600/20 transition-all" title="View Profile"><i class="fa-solid fa-eye text-[11px]"></i></button>
-                                <button onclick="editCustomerProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-amber-600/20 transition-all" title="Edit Properties"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                                <button onclick="viewProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-purple-600/20 transition-all" title="View Profile"><i class="fa-solid fa-eye text-[11px]"></i></button>
+                                <button onclick="editProfile('${user.accountNo}')" class="w-7 h-7 flex items-center justify-center bg-white/5 text-slate-300 rounded-lg hover:text-white hover:bg-amber-600/20 transition-all" title="Edit Properties"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -179,7 +160,88 @@
             });
         }
 
-        // Synchronize on script viewport activation trigger bound
+        // 2. View Function Profile Protocol
+        function viewProfile(accountNo) {
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            let target = customers.find(c => c.accountNo === accountNo);
+            if (!target) return;
+
+            document.getElementById('modalTitle').innerText = `View Account Structure [ ${accountNo} ]`;
+            setFieldState(true);
+            populateModalData(target);
+            document.getElementById('modalSubmitBtn').classList.add('hidden');
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        // 3. Edit Profile Form Open Protocol
+        function editProfile(accountNo) {
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            let target = customers.find(c => c.accountNo === accountNo);
+            if (!target) return;
+
+            document.getElementById('modalTitle').innerText = `Modify Registry Data [ ${accountNo} ]`;
+            setFieldState(false);
+            populateModalData(target);
+            document.getElementById('modalSubmitBtn').classList.remove('hidden');
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        // Helper Data Population Core Tools
+        function populateModalData(data) {
+            document.getElementById('modalAccountNo').value = data.accountNo || '';
+            document.getElementById('modalName').value = data.customerName || '';
+            document.getElementById('modalMobile').value = data.mobile || '';
+            document.getElementById('modalPrincipal').value = data.principal || 0;
+            document.getElementById('modalEMI').value = data.emi || 0;
+        }
+
+        function setFieldState(isDisabled) {
+            document.getElementById('modalName').disabled = isDisabled;
+            document.getElementById('modalMobile').disabled = isDisabled;
+            document.getElementById('modalPrincipal').disabled = isDisabled;
+            document.getElementById('modalEMI').disabled = isDisabled;
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.add('hidden');
+        }
+
+        // 4. Update Pipeline & Local Cache Sync Action
+        function saveUpdatedCustomerData(e) {
+            e.preventDefault();
+            let targetAc = document.getElementById('modalAccountNo').value;
+            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            
+            let targetIdx = customers.findIndex(c => c.accountNo === targetAc);
+            if(targetIdx === -1) return;
+
+            // Mapping updated memory payloads
+            customers[targetIdx].customerName = document.getElementById('modalName').value;
+            customers[targetIdx].mobile = document.getElementById('modalMobile').value;
+            customers[targetIdx].principal = parseFloat(document.getElementById('modalPrincipal').value) || 0;
+            customers[targetIdx].emi = parseFloat(document.getElementById('modalEMI').value) || 0;
+
+            // Commit back directly to localStorage engine bounds
+            localStorage.setItem('vp_local_customers', JSON.stringify(customers));
+            renderActiveLedgerGrid();
+            closeActionModal();
+
+            // Cloud sheet silent handshake tracking routing parameters URL
+            const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ 
+                action: 'updateCustomer', 
+                data: customers[targetIdx] 
+            }))}`;
+
+            fetch(syncEndpoint, { method: 'GET', mode: 'cors' })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.status === 'success') console.log("Cloud server sync operational!");
+            }).catch(err => console.warn("Cloud connection latency bypassed:", err));
+
+            alert('🎉 Success Machi! Local memory variables & Sheet background queues updated!');
+        }
+
+        // Bootstrapping
         document.addEventListener('DOMContentLoaded', renderActiveLedgerGrid);
     </script>
 </body>
