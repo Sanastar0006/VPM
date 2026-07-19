@@ -37,8 +37,11 @@ async function syncDashboardRealtimeMetrics() {
             return;
         }
 
+        // OPTIMIZATION: Added cors mode and redirect follow for Google Macro Web Apps
         const response = await fetch(DASHBOARD_WEBAPP_URL, {
             method: 'GET',
+            mode: 'cors',
+            redirect: 'follow', 
             cache: 'no-cache'
         });
 
@@ -50,9 +53,10 @@ async function syncDashboardRealtimeMetrics() {
         try {
             responseData = JSON.parse(responseText);
         } catch(e) {
-            // Handled text matrix mapping
+            // Log parsing breakdown explicitly for rapid cloud code alignment
+            console.error("JSON Matrix Parser Breakdown:", e, "Raw Payload:", responseText);
             processAnalyticsDatastream(structuralMockArray);
-            logElement.innerHTML = `<span class="text-emerald-400 font-mono text-[11px]">[ONLINE] Cloud Matrix Pipeline Engaged.</span>`;
+            logElement.innerHTML = `<span class="text-amber-400 font-mono text-[11px]">[ONLINE] Cloud Matrix Pipeline Engaged. Parsed Fallback Stream Active.</span>`;
             return;
         }
         
