@@ -290,7 +290,27 @@ let newTransactionLogEntry = {
 existingLogs.push(newTransactionLogEntry);
 localStorage.setItem('vp_local_transactions', JSON.stringify(existingLogs));
 
+// --- DYNAMIC TRANSACTION AUDIT REGISTER STORAGE PIPELINE ---
+// Place this transaction matrix patch right before or after the customer balance reduction storage sequence line inside your transaction form submit function.
 
+// 1. Target transaction logging entry collection setup
+let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
+
+// 2. Map transaction execution structural fields parameters
+let dynamicTransactionAuditPayload = {
+    accountNo: document.getElementById('searchAccount').value.toUpperCase().trim(), 
+    paymentMode: document.getElementById('paymentMode').value, // Custom tracking values configuration (UPI / Cash / Split)
+    amountCollected: parseFloat(document.getElementById('amountCollected').value) || 0,
+    referenceNo: document.getElementById('paymentMode').value === 'UPI' ? (document.getElementById('referenceNo').value || 'UPI Transaction') : 'N/A (Cash Terminal Entry)',
+    timestamp: new Date().toISOString() // Standard timeline sequence injection parameters
+};
+
+// 3. Array matrix structural insertion loop progression
+activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
+
+// 4. Remote local registry write out updates execution
+localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
+// --- END TRANSACTION MATRIX SYSTEM ENHANCEMENT FLOW ---
 
 
         
