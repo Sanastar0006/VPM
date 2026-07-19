@@ -243,7 +243,7 @@
             document.getElementById('transactionForm').reset();
         }
 
-// 4. Clean Data Sync & Audit Logging Pipeline
+        // 4. FIX: Capturing Exact Evaluated Dropdown Value Pipeline
         function executeTransactionCommit(e) {
             e.preventDefault();
             
@@ -252,7 +252,10 @@
             const mode = document.getElementById('paymentMode').value;
             const amt = parseFloat(document.getElementById('collectedAmount').value) || 0;
             const refNo = document.getElementById('referenceNo').value.trim();
-            const bankName = document.getElementById('bankName').value;
+            
+            // Fixed extraction logic for bank selector element explicitly
+            const bankElement = document.getElementById('bankName');
+            const rawBankName = bankElement ? bankElement.value : '';
 
             if(!name || name === 'Auto-populated Name') {
                 alert("⚠️ Error Machi! Choose a valid registered account from the list.");
@@ -276,20 +279,20 @@
                 paymentMode: mode,
                 amountCollected: amt,
                 referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
-                bankName: mode === 'Cash' ? 'N/A' : (bankName || 'Not Specified'),
+                bankName: mode === 'Cash' ? 'N/A' : (rawBankName || 'Not Specified'),
                 timestamp: new Date().toISOString()
             };
             activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
             localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
 
-            // FIX MACHI: Standardized Cloud Sync Object Mapping explicitly
+            // C. Cloud Sync Object Mapping explicitly
             const payload = {
                 action: 'saveTransaction',
                 accountNo: acNo.toUpperCase(),
                 paymentMode: mode,
                 amountCollected: amt,
                 referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
-                bankName: mode === 'Cash' ? 'N/A' : (bankName || 'Not Specified'),
+                bankName: mode === 'Cash' ? 'N/A' : (rawBankName || 'Not Specified'),
                 timestamp: new Date().toISOString()
             };
 
@@ -301,7 +304,7 @@
                 if(resData.status === 'success') console.log("Google Sheets logging synchronization active!");
             }).catch(err => console.warn("Cloud connection latency bypassed:", err));
 
-            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} (${mode === 'Cash' ? 'Cash' : bankName}) logged successfully!`);
+            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} (${mode === 'Cash' ? 'Cash' : rawBankName}) logged successfully!`);
             clearTransactionTerminal();
         }
     </script>
