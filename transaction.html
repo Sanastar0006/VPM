@@ -107,13 +107,27 @@
                     </div>
                 </div>
 
-                <div id="referenceNoContainer" class="hidden border-t border-white/5 pt-4 transition-all duration-300">
+                <!-- Dynamic Non-Cash Container (Reference No & Bank Selector) -->
+                <div id="nonCashContainer" class="hidden grid grid-cols-2 gap-4 border-t border-white/5 pt-4 transition-all duration-300">
                     <div>
                         <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Reference No / Txn ID</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-receipt"></i></span>
-                            <input type="text" id="referenceNo" placeholder="Enter UPI Ref No, UTR, or Transaction ID" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
+                            <input type="text" id="referenceNo" placeholder="Enter UPI Ref, UTR, etc." class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Receiving Bank Channel</label>
+                        <select id="bankName" class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
+                            <option value="" disabled selected>Select Bank</option>
+                            <option value="State Bank of India">State Bank of India (SBI)</option>
+                            <option value="HDFC Bank">HDFC Bank</option>
+                            <option value="ICICI Bank">ICICI Bank</option>
+                            <option value="Axis Bank">Axis Bank</option>
+                            <option value="Indian Bank">Indian Bank</option>
+                            <option value="Canara Bank">Canara Bank</option>
+                            <option value="Tamilnad Mercantile Bank">Tamilnad Mercantile Bank (TMB)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -134,19 +148,23 @@
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        // 1. Conditional Layout Logic for Reference Input Field
+        // 1. Conditional Layout Logic for Reference & Bank Fields
         function evaluatePaymentChannelView() {
             const currentMode = document.getElementById('paymentMode').value;
-            const refContainer = document.getElementById('referenceNoContainer');
+            const nonCashContainer = document.getElementById('nonCashContainer');
             const refInput = document.getElementById('referenceNo');
+            const bankInput = document.getElementById('bankName');
 
             if (currentMode === 'UPI' || currentMode === 'Split Payment' || currentMode === 'NEFT or IMPS') {
-                refContainer.classList.remove('hidden');
+                nonCashContainer.classList.remove('hidden');
                 refInput.required = true;
+                bankInput.required = true;
             } else {
-                refContainer.classList.add('hidden');
+                nonCashContainer.classList.add('hidden');
                 refInput.required = false;
+                bankInput.required = false;
                 refInput.value = ''; 
+                bankInput.value = '';
             }
         }
 
@@ -221,7 +239,7 @@
 
         function clearTransactionTerminal() {
             document.getElementById('searchDropdown').classList.add('hidden');
-            document.getElementById('referenceNoContainer').classList.add('hidden');
+            document.getElementById('nonCashContainer').classList.add('hidden');
             document.getElementById('transactionForm').reset();
         }
 
@@ -234,6 +252,7 @@
             const mode = document.getElementById('paymentMode').value;
             const amt = parseFloat(document.getElementById('collectedAmount').value) || 0;
             const refNo = document.getElementById('referenceNo').value.trim();
+            const bankName = document.getElementById('bankName').value;
 
             if(!name || name === 'Auto-populated Name') {
                 alert("⚠️ Error Machi! Choose a valid registered account from the list.");
@@ -250,13 +269,14 @@
                 localStorage.setItem('vp_local_customers', JSON.stringify(customers));
             }
 
-            // B. EXACT FIX: Write Transaction Log History for Report Screen
+            // B. Write Transaction Log History (Including Bank Data)
             let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
             let dynamicTransactionAuditPayload = {
                 accountNo: acNo.toUpperCase(),
                 paymentMode: mode,
                 amountCollected: amt,
                 referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
+                bankName: mode === 'Cash' ? 'N/A' : (bankName || 'Not Specified'),
                 timestamp: new Date().toISOString()
             };
             activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
@@ -276,7 +296,7 @@
                 if(resData.status === 'success') console.log("Google Sheets logging synchronization active!");
             }).catch(err => console.warn("Cloud connection latency bypassed:", err));
 
-            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} logged successfully!`);
+            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} (${mode === 'Cash' ? 'Cash' : bankName}) logged successfully!`);
             clearTransactionTerminal();
         }
     </script>
