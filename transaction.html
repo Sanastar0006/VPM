@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VP Microfinance Pro 2026 - Transaction Ledger Terminal</title>
-    <!-- Premium Tailwind CSS Integration Layer -->
+    <title>VP Microfinance Pro 2026 - Transaction Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons Vector Matrix Mapping Integration -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen antialiased selection:bg-amber-500 selection:text-slate-900">
 
-    <!-- TOP CONTROL MATRIX BAR BANNER LAYER -->
+    <!-- MASTER TOP CONTROL BAR BANNER MODULE -->
     <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="h-9 w-9 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/10">
@@ -33,61 +31,55 @@
         </div>
     </header>
 
-    <!-- MAIN GRID PIPELINE CONTROLLER ARCHITECTURE -->
+    <!-- CORE EXECUTION CONTEXT WINDOW LAYER -->
     <main class="max-w-4xl mx-auto p-6 space-y-8">
         
-        <!-- TRANSACTION MATRIX LOG INTERFACE CONTAINER CARD -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-            <div class="border-b border-slate-800 bg-slate-900/50 p-6 flex justify-between items-center">
-                <div>
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-white font-mono">Initialize Transaction Node</h2>
-                    <p class="text-xs text-slate-400">Post dynamic entries into localized ledger pipelines.</p>
-                </div>
-                <span class="text-[10px] font-mono text-amber-400 bg-amber-400/5 px-2 py-0.5 rounded border border-amber-500/10">[TRANSACTION MATRIX ENGINE]</span>
+            <div class="border-b border-slate-800 bg-slate-900/50 p-6">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-white font-mono">Initialize Transaction Node</h2>
+                <p class="text-xs text-slate-400">Post dynamic entries into localized ledger pipelines.</p>
             </div>
 
             <form id="ledgerTransactionForm" class="p-6 space-y-6">
-                <!-- BASE LINE METRICS FIELDS FOR INITIAL GRID SELECTIONS -->
+                <!-- ROW 1: ACCOUNT ID AND AUTOMATED CUSTOMER NAME LOOKUP MATRIX -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Account Identification No</label>
-                        <input type="text" placeholder="e.g. VP-1001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                        <input type="text" id="accountIdentificationNo" oninput="executeAutomatedProfileLookup()" placeholder="Type e.g. VP-1001" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors font-mono">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Customer Profile Name</label>
-                        <input type="text" placeholder="Enter profile entity name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                        <!-- Protected input system - locks manually, populates dynamically from local lookup matrix array -->
+                        <input type="text" id="customerProfileName" placeholder="Waiting Account Identification data mapping..." readonly class="w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-sm text-slate-400 focus:outline-none cursor-not-allowed transition-colors">
                     </div>
                 </div>
 
+                <!-- ROW 2: TRANSACTION VALUES & CORE PAYMENT MODES -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Transaction Volume Amount (₹)</label>
                         <input type="number" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
                     </div>
                     <div>
-                        <!-- MODIFIED ENHANCED PAYMENT SELECTOR MATRIX -->
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Payment Mode Channel</label>
-                        <select id="paymentModeChannel" onchange="handlePaymentModeRouteToggle()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors cursor-pointer">
+                        <select id="paymentModeChannel" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors cursor-pointer">
                             <option value="CASH">Cash Transaction Protocol</option>
                             <option value="UPI">UPI Digital Routing Link</option>
                             <option value="NEFT">NEFT National Clearing Pipeline</option>
                             <option value="IMPS">IMPS Immediate Network Transfer</option>
-                            <option value="SPLIT">Split Protocol Multi-Channel Matrix</option>
                             <option value="CHEQUE">Cheque Clearance Engine Protocol</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- DYNAMIC CONDITIONAL BANKING CORE FIELDS CONTAINER -->
-                <div id="dynamicBankingMatrixFields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-5 border border-slate-800 bg-slate-950/40 rounded-xl transition-all duration-300">
-                    <!-- Dynamic Secondary Reference Node -->
+                <!-- ROW 3: REFERENCE MAPPING AND THE NEW INTEGRATED BANK SELECT MATRIX -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label id="dynamicRefLabel" class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Reference No / Txn ID</label>
-                        <input type="text" id="secondaryRefNo" placeholder="Enter clearance transaction parameter tracking identifier..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
+                        <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Reference No / Txn ID</label>
+                        <input type="text" placeholder="Enter Reference Parameter Mapping..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors">
                     </div>
-                    
-                    <!-- Premium Structured Banking Node Selector Option -->
                     <div>
+                        <!-- RESTORED CLEAN BANK COMPONENT SELECTOR FIELDS -->
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Settlement Bank Name</label>
                         <select id="bankNameSelector" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors cursor-pointer">
                             <option value="">-- Select Cleared Banking Settlement Node --</option>
@@ -100,9 +92,9 @@
                     </div>
                 </div>
 
-                <!-- ACTION TRIGGERS ALIGNMENT PROTOCOLS -->
+                <!-- FOOTER ACTIONS AND OPERATIONS CONTROLS CONTROLLER -->
                 <div class="border-t border-slate-800 pt-6 flex justify-end gap-4">
-                    <button type="reset" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-300 transition-colors">
+                    <button type="reset" onclick="resetLedgerDataFields()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-300 transition-colors">
                         Reset Node Metrics
                     </button>
                     <button type="button" onclick="submitLedgerTransaction()" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-[0.98] transition-all flex items-center gap-2">
@@ -113,61 +105,74 @@
             </form>
         </div>
 
-        <!-- DIAGNOSTIC PIPELINE MONITOR LOGGER LOG -->
+        <!-- LOG BUFFER MONITOR CONSOLE MODULE -->
         <div class="bg-slate-900/40 border border-slate-800 rounded-xl px-4 py-3 flex justify-between items-center font-mono">
             <div class="flex items-center gap-2">
                 <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i>
                 <p class="text-[11px] text-slate-400">Terminal Pipeline Output Status Monitor:</p>
-                <div id="diagnosticsLog" class="text-[11px] text-emerald-400 font-semibold">[IDLE] Safe Sandbox Environment Active. Waiting payload initialization.</div>
+                <div id="diagnosticsLog" class="text-[11px] text-emerald-400 font-semibold">[IDLE] Engine Buffers Matrix Loaded. Safe Sandbox Mode Active.</div>
             </div>
         </div>
 
     </main>
 
-    <!-- CORE INTEGRATED DYNAMIC ROUTING SCRIPT BLOCK LAYERS -->
+    <!-- AUTOMATION CONTROLLERS AND LOGIC INTEGRATIONS SCRIPT -->
     <script>
-        // Initialize dynamic iconography layouts tracking systems on initialization runtime
+        // Core structural local analytics array lookup data cache matrix tracking mapping link
+        const structuralMockArrayStore = [
+            { accountNo: 'VP-1001', name: 'Muthu Kumar' },
+            { accountNo: 'VP-1002', name: 'Anitha Raj' },
+            { accountNo: 'VP-1003', name: 'Selvam S.' }
+        ];
+
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
         });
 
         /**
-         * AUTOMATED PAYMENT MODE CONTEXT SWITCH ENGINE ROUTINE
+         * RESTORED AUTOMATED ACCOUNT ID TO PROFILE LOOKUP MECHANIC
          */
-        function handlePaymentModeRouteToggle() {
-            const selectedMode = document.getElementById('paymentModeChannel').value;
-            const dynamicFields = document.getElementById('dynamicBankingMatrixFields');
-            const dynamicRefLabel = document.getElementById('dynamicRefLabel');
-            
-            // Channel parameters matching verification triggers
-            const matrixGateways = ['UPI', 'NEFT', 'IMPS', 'SPLIT', 'CHEQUE'];
-            
-            if (matrixGateways.includes(selectedMode)) {
-                // Remove hidden configuration layers with soft micro transitions maps
-                dynamicFields.classList.remove('hidden');
-                
-                // Dynamically realign text tags seamlessly based on selection target criterion
-                if (selectedMode === 'CHEQUE') {
-                    dynamicRefLabel.innerText = "Cheque Clearing No / Instrument ID";
-                } else {
-                    dynamicRefLabel.innerText = "Reference No / Txn ID";
-                }
+        function executeAutomatedProfileLookup() {
+            const inputVal = document.getElementById('accountIdentificationNo').value.trim().toUpperCase();
+            const targetNameInput = document.getElementById('customerProfileName');
+            const statusLog = document.getElementById('diagnosticsLog');
+
+            if (inputVal === '') {
+                targetNameInput.value = '';
+                targetNameInput.placeholder = "Waiting Account Identification data mapping...";
+                statusLog.innerHTML = `<span class="text-emerald-400 font-semibold">[IDLE] Field monitoring active.</span>`;
+                return;
+            }
+
+            // Find matching context array indexes mapping elements inside store system
+            const matchedProfile = structuralMockArrayStore.find(profile => profile.accountNo === inputVal);
+
+            if (matchedProfile) {
+                targetNameInput.value = matchedProfile.name;
+                targetNameInput.classList.remove('text-slate-400');
+                targetNameInput.classList.add('text-amber-400', 'font-semibold');
+                statusLog.innerHTML = `<span class="text-emerald-400 font-semibold">[MATCH FOUND] Resolved entity: ${matchedProfile.name} linked securely.</span>`;
             } else {
-                // Fallback state mapping hides structural secondary field matrices safely
-                dynamicFields.classList.add('hidden');
+                targetNameInput.value = '';
+                targetNameInput.placeholder = "No profile matching entity parameters...";
+                statusLog.innerHTML = `<span class="text-rose-400 font-semibold">[ERROR] Identification No '${inputVal}' not found inside active database nodes.</span>`;
             }
         }
 
-        /**
-         * INTERFACE TRANSACTION PAYLOAD SUBMIT SIMULATION ENGINE ROUTINE
-         */
+        function resetLedgerDataFields() {
+            const nameField = document.getElementById('customerProfileName');
+            nameField.value = '';
+            nameField.className = "w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-sm text-slate-400 focus:outline-none cursor-not-allowed transition-colors";
+            document.getElementById('diagnosticsLog').innerHTML = `<span class="text-emerald-400 font-semibold">[RESET] Ledger form metrics fields reverted successfully.</span>`;
+        }
+
         function submitLedgerTransaction() {
             const statusLog = document.getElementById('diagnosticsLog');
-            statusLog.innerHTML = `<span class="text-amber-400 animate-pulse">[COMMITTING] Syncing pipeline entries to core matrix node ledger...</span>`;
+            statusLog.innerHTML = `<span class="text-amber-400 animate-pulse">[COMMITTING] Syncing entries to cloud microfinance nodes...</span>`;
             
             setTimeout(() => {
-                statusLog.innerHTML = `<span class="text-emerald-400">[SUCCESS] Block commit operations absolute complete. Data secure inside ledger pipeline mapping layer!</span>`;
-            }, 1200);
+                statusLog.innerHTML = `<span class="text-emerald-400">[SUCCESS] Operation complete. Data mapped into registry backend channels.</span>`;
+            }, 1000);
         }
     </script>
 </body>
