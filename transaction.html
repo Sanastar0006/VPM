@@ -243,7 +243,7 @@
             document.getElementById('transactionForm').reset();
         }
 
-        // 4. Clean Data Sync & Audit Logging Pipeline
+// 4. Clean Data Sync & Audit Logging Pipeline
         function executeTransactionCommit(e) {
             e.preventDefault();
             
@@ -282,10 +282,15 @@
             activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
             localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
 
-            // C. Cloud Logging Pipeline Stream
+            // FIX MACHI: Standardized Cloud Sync Object Mapping explicitly
             const payload = {
                 action: 'saveTransaction',
-                data: dynamicTransactionAuditPayload
+                accountNo: acNo.toUpperCase(),
+                paymentMode: mode,
+                amountCollected: amt,
+                referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
+                bankName: mode === 'Cash' ? 'N/A' : (bankName || 'Not Specified'),
+                timestamp: new Date().toISOString()
             };
 
             const remoteSyncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify(payload))}`;
