@@ -100,93 +100,101 @@
         </div>
     </main>
 
-    <script>
-        // 2. Data Registry Stream Controllers (Mock Data Architecture Setup)
-        function triggerReportSearch() {
-            const inputVal = document.getElementById('reportSearchAccount').value.toUpperCase().trim();
-            const dropdown = document.getElementById('reportDropdown');
-            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-            
-            if (customers.length === 0) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No operational cache loaded!</div>`;
-                dropdown.classList.remove('hidden');
-                return;
-            }
-
-            let filtered = customers.filter(c => (c.accountNo || '').toUpperCase().includes(inputVal));
-            dropdown.innerHTML = '';
-            
-            if(filtered.length === 0) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No matching matrix signature!</div>`;
-                dropdown.classList.remove('hidden');
-                return;
-            }
-
-            filtered.forEach(acc => {
-                const row = document.createElement('div');
-                row.className = "px-4 py-2.5 hover:bg-purple-600/20 text-xs border-b border-white/5 cursor-pointer flex justify-between items-center transition-all group";
-                row.innerHTML = `
-                    <span class="font-mono font-bold text-purple-400 group-hover:text-white">${acc.accountNo}</span>
-                    <span class="text-slate-400 text-[11px] group-hover:text-slate-200">${acc.customerName}</span>
-                `;
-                row.onclick = () => selectProfileForReport(acc);
-                dropdown.appendChild(row);
-            });
+<script>
+    // 1. Dynamic Dropdown Search Setup
+    function triggerReportSearch() {
+        const inputVal = document.getElementById('reportSearchAccount').value.toUpperCase().trim();
+        const dropdown = document.getElementById('reportDropdown');
+        let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+        
+        if (customers.length === 0) {
+            dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No operational cache loaded!</div>`;
             dropdown.classList.remove('hidden');
+            return;
         }
 
-        function selectProfileForReport(customer) {
-            document.getElementById('reportSearchAccount').value = customer.accountNo;
-            document.getElementById('reportDropdown').classList.add('hidden');
-            
-            // Render Profile Summaries UI panel mappings
-            document.getElementById('summaryName').innerText = customer.customerName;
-            document.getElementById('summaryMobile').innerText = `Terminal: ${customer.mobile}`;
-            document.getElementById('summaryPrincipal').innerText = `₹${parseFloat(customer.principal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-            document.getElementById('summaryEmi').innerText = `Installment: ₹${parseFloat(customer.emi).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-            document.getElementById('summaryOutstanding').innerText = `₹${parseFloat(customer.totalOutstanding).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
-            document.getElementById('customerSummaryPanel').classList.remove('hidden');
-
-            renderTransactionHistoryMatrix(customer.accountNo);
+        let filtered = customers.filter(c => (c.accountNo || '').toUpperCase().includes(inputVal));
+        dropdown.innerHTML = '';
+        
+        if(filtered.length === 0) {
+            dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No matching matrix signature!</div>`;
+            dropdown.classList.remove('hidden');
+            return;
         }
 
-        function renderTransactionHistoryMatrix(accountNo) {
-            const tableBody = document.getElementById('reportTableBody');
-            
-            // Simulation Cache Ledger Mapping Injection (Unga logic kooda easy fallback matrix run aagum)
-            let mockLogs = [
-                { accountNo: 'VP-1002', paymentMode: 'UPI', amountCollected: 2500, referenceNo: 'TXN9872102941', timestamp: '2026-07-10T10:30:00.000Z' },
-                { accountNo: 'VP-1002', paymentMode: 'Cash', amountCollected: 2500, referenceNo: 'N/A (Cash)', timestamp: '2026-06-10T16:45:00.000Z' },
-                { accountNo: 'VP-1003', paymentMode: 'Split Payment', amountCollected: 5000, referenceNo: 'UTR209148102', timestamp: '2026-07-12T11:15:00.000Z' }
-            ];
-
-            let filteredLogs = mockLogs.filter(log => log.accountNo === accountNo);
-            tableBody.innerHTML = '';
-
-            if(filteredLogs.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-12 text-slate-500 text-xs font-medium"><i class="fa-solid fa-ban block text-lg mb-2 text-slate-600"></i> No payment history logged for this account identifier tracking framework yet.</td></tr>`;
-                return;
-            }
-
-            filteredLogs.forEach(log => {
-                let cleanDate = new Date(log.timestamp).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
-                tableBody.innerHTML += `
-                    <tr class="border-b border-white/5 hover:bg-white/[0.01] transition-colors font-medium">
-                        <td class="px-6 py-4 text-slate-400">${cleanDate}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 text-[10px] font-mono">${log.paymentMode}</span></td>
-                        <td class="px-6 py-4 font-mono text-slate-400 text-[11px]">${log.referenceNo}</td>
-                        <td class="px-6 py-4 text-right text-emerald-400 font-mono font-bold">₹${parseFloat(log.amountCollected).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('reportDropdown');
-            if (e.target !== dropdown && e.target !== document.getElementById('reportSearchAccount')) {
-                dropdown.classList.add('hidden');
-            }
+        filtered.forEach(acc => {
+            const row = document.createElement('div');
+            row.className = "px-4 py-2.5 hover:bg-purple-600/20 text-xs border-b border-white/5 cursor-pointer flex justify-between items-center transition-all group";
+            row.innerHTML = `
+                <span class="font-mono font-bold text-purple-400 group-hover:text-white">${acc.accountNo}</span>
+                <span class="text-slate-400 text-[11px] group-hover:text-slate-200">${acc.customerName}</span>
+            `;
+            row.onclick = () => selectProfileForReport(acc);
+            dropdown.appendChild(row);
         });
-    </script>
+        dropdown.classList.remove('hidden');
+    }
+
+    // 2. Load Selected Customer Summary
+    function selectProfileForReport(customer) {
+        document.getElementById('reportSearchAccount').value = customer.accountNo;
+        document.getElementById('reportDropdown').classList.add('hidden');
+        
+        document.getElementById('summaryName').innerText = customer.customerName;
+        document.getElementById('summaryMobile').innerText = `Terminal: ${customer.mobile}`;
+        document.getElementById('summaryPrincipal').innerText = `₹${parseFloat(customer.principal).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        document.getElementById('summaryEmi').innerText = `Installment: ₹${parseFloat(customer.emi).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        document.getElementById('summaryOutstanding').innerText = `₹${parseFloat(customer.totalOutstanding).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        document.getElementById('customerSummaryPanel').classList.remove('hidden');
+
+        // Target Account details load aanathum history rendering start aagum
+        renderTransactionHistoryMatrix(customer.accountNo);
+    }
+
+    // 3. FIX: Dynamic Real-time Local Storage Transactions Pulling
+    function renderTransactionHistoryMatrix(accountNo) {
+        const tableBody = document.getElementById('reportTableBody');
+        
+        // Dynamic logs loaded directly from your actual transactional system!
+        let actualLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
+
+        // Filter transactions only belonging to this specific user profile
+        let filteredLogs = actualLogs.filter(log => log.accountNo === accountNo);
+        tableBody.innerHTML = '';
+
+        if(filteredLogs.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-12 text-slate-500 text-xs font-medium"><i class="fa-solid fa-ban block text-lg mb-2 text-slate-600"></i> No payment history logged for this account identifier tracking framework yet.</td></tr>`;
+            return;
+        }
+
+        // Fresh data processing engine sequence loop
+        filteredLogs.forEach(log => {
+            let logDate = log.timestamp ? new Date(log.timestamp) : new Date();
+            let cleanDate = logDate.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
+            
+            // Checking fields fallback elements just in case
+            let pMode = log.paymentMode || 'Cash';
+            let refNo = log.referenceNo || 'N/A';
+            let amt = log.amountCollected || 0;
+
+            tableBody.innerHTML += `
+                <tr class="border-b border-white/5 hover:bg-white/[0.01] transition-colors font-medium">
+                    <td class="px-6 py-4 text-slate-400">${cleanDate}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 text-[10px] font-mono">${pMode}</span></td>
+                    <td class="px-6 py-4 font-mono text-slate-400 text-[11px]">${refNo}</td>
+                    <td class="px-6 py-4 text-right text-emerald-400 font-mono font-bold">₹${parseFloat(amt).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Click outside handler to hide dropdown
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('reportDropdown');
+        if (e.target !== dropdown && e.target !== document.getElementById('reportSearchAccount')) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
 </body>
 </html>
