@@ -26,16 +26,14 @@
                 <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
             </div>
         </div>
-       <!-- Only inside transaction-report.html Sidebar Links Container Module Layout -->
-<nav class="space-y-1">
-    <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-chart-pie"></i> Dashboard Matrix</a>
-    <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
-    <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
-    <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal</a>
-    
-    <!-- Active Highlight Switch Matrix Activated -->
-    <a href="transaction-report.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all duration-200"><i class="fa-solid fa-file-invoice-dollar"></i> Collection Reports</a>
-</nav>
+
+        <nav class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-chart-pie"></i> Dashboard Matrix</a>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
+            <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all duration-200"><i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal</a>
+            <a href="transaction-report.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-file-invoice-dollar"></i> Collection Reports</a>
+        </nav>
     </aside>
 
     <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
@@ -58,8 +56,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
                         <input type="text" id="searchAccount" autocomplete="off" onfocus="triggerAccountSearchPipeline()" oninput="triggerAccountSearchPipeline()" placeholder="Click or type to search (e.g., VP-102...)" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
                     </div>
-                    <div id="searchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown">
-                        </div>
+                    <div id="searchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown"></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -158,7 +155,6 @@
             const inputVal = document.getElementById('searchAccount').value.toUpperCase().trim();
             const dropdown = document.getElementById('searchDropdown');
             
-            // Auto loading customer memory maps
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             
             if (customers.length === 0) {
@@ -167,7 +163,6 @@
                 return;
             }
 
-            // Filter logic matches everything if input is clean empty focus
             let filtered = customers.filter(c => {
                 let currentAcNo = (c.accountNo || c.accountNumber || '').toUpperCase();
                 return inputVal === '' || currentAcNo.includes(inputVal);
@@ -215,7 +210,7 @@
             document.getElementById('searchDropdown').classList.add('hidden');
         }
 
-        // Dynamic click listener to dismiss selection panels
+        // Dismiss panels
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('searchDropdown');
             const searchInput = document.getElementById('searchAccount');
@@ -230,7 +225,7 @@
             document.getElementById('transactionForm').reset();
         }
 
-        // 4. Data Sync Processing Pipeline
+        // 4. Clean Data Sync & Audit Logging Pipeline
         function executeTransactionCommit(e) {
             e.preventDefault();
             
@@ -245,6 +240,7 @@
                 return;
             }
 
+            // A. Update Customer Outstanding Balance Matrix
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let index = customers.findIndex(c => (c.accountNo || c.accountNumber) === acNo);
 
@@ -254,16 +250,22 @@
                 localStorage.setItem('vp_local_customers', JSON.stringify(customers));
             }
 
+            // B. EXACT FIX: Write Transaction Log History for Report Screen
+            let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
+            let dynamicTransactionAuditPayload = {
+                accountNo: acNo.toUpperCase(),
+                paymentMode: mode,
+                amountCollected: amt,
+                referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
+                timestamp: new Date().toISOString()
+            };
+            activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
+            localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
+
+            // C. Cloud Logging Pipeline Stream
             const payload = {
                 action: 'saveTransaction',
-                data: {
-                    accountNo: acNo,
-                    customerName: name,
-                    paymentMode: mode,
-                    amountCollected: amt,
-                    referenceNo: refNo || 'N/A (Cash)',
-                    timestamp: new Date().toISOString()
-                }
+                data: dynamicTransactionAuditPayload
             };
 
             const remoteSyncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify(payload))}`;
@@ -274,46 +276,9 @@
                 if(resData.status === 'success') console.log("Google Sheets logging synchronization active!");
             }).catch(err => console.warn("Cloud connection latency bypassed:", err));
 
-            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} logged successfully!\nRef No: ${refNo || 'N/A'}`);
+            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} logged successfully!`);
             clearTransactionTerminal();
         }
-
-// Sample integration function snippet inside transaction handling event logic tracking:
-let existingLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
-let newTransactionLogEntry = {
-    accountNo: targetAccountNoField, // User inputs validation account matrix reference tags
-    paymentMode: selectedMode, // UPI / Cash variables configurations selection routing module
-    amountCollected: parseFloat(enteredCollectionAmount), 
-    referenceNo: document.getElementById('referenceNo').value || 'N/A (Cash Transaction)',
-    timestamp: new Date().toISOString() // Dynamic Realtime timestamp injection module matrix
-};
-existingLogs.push(newTransactionLogEntry);
-localStorage.setItem('vp_local_transactions', JSON.stringify(existingLogs));
-
-// --- DYNAMIC TRANSACTION AUDIT REGISTER STORAGE PIPELINE ---
-// Place this transaction matrix patch right before or after the customer balance reduction storage sequence line inside your transaction form submit function.
-
-// 1. Target transaction logging entry collection setup
-let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
-
-// 2. Map transaction execution structural fields parameters
-let dynamicTransactionAuditPayload = {
-    accountNo: document.getElementById('searchAccount').value.toUpperCase().trim(), 
-    paymentMode: document.getElementById('paymentMode').value, // Custom tracking values configuration (UPI / Cash / Split)
-    amountCollected: parseFloat(document.getElementById('amountCollected').value) || 0,
-    referenceNo: document.getElementById('paymentMode').value === 'UPI' ? (document.getElementById('referenceNo').value || 'UPI Transaction') : 'N/A (Cash Terminal Entry)',
-    timestamp: new Date().toISOString() // Standard timeline sequence injection parameters
-};
-
-// 3. Array matrix structural insertion loop progression
-activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
-
-// 4. Remote local registry write out updates execution
-localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
-// --- END TRANSACTION MATRIX SYSTEM ENHANCEMENT FLOW ---
-
-
-        
     </script>
 </body>
 </html>
