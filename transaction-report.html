@@ -151,7 +151,7 @@
         renderTransactionHistoryMatrix(customer.accountNo);
     }
 
-    // 3. FIX: Dynamic Real-time Local Storage Transactions Pulling
+    // 3. FIX: Dynamic Real-time Local Storage Transactions Pulling (With Bank Channel Integration)
     function renderTransactionHistoryMatrix(accountNo) {
         const tableBody = document.getElementById('reportTableBody');
         
@@ -172,15 +172,22 @@
             let logDate = log.timestamp ? new Date(log.timestamp) : new Date();
             let cleanDate = logDate.toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
             
-            // Checking fields fallback elements just in case
+            // Checking fields fallback elements
             let pMode = log.paymentMode || 'Cash';
+            let bankName = log.bankName || '';
             let refNo = log.referenceNo || 'N/A';
             let amt = log.amountCollected || 0;
+
+            // Formulating display badge text based on whether Bank Name exists and is valid
+            let channelDisplay = pMode;
+            if (bankName && bankName !== 'N/A' && bankName !== 'Not Specified') {
+                channelDisplay = `${pMode} (${bankName})`;
+            }
 
             tableBody.innerHTML += `
                 <tr class="border-b border-white/5 hover:bg-white/[0.01] transition-colors font-medium">
                     <td class="px-6 py-4 text-slate-400">${cleanDate}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 text-[10px] font-mono">${pMode}</span></td>
+                    <td class="px-6 py-4"><span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 text-[10px] font-mono">${channelDisplay}</span></td>
                     <td class="px-6 py-4 font-mono text-slate-400 text-[11px]">${refNo}</td>
                     <td class="px-6 py-4 text-right text-emerald-400 font-mono font-bold">₹${parseFloat(amt).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
                 </tr>
