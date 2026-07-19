@@ -26,20 +26,16 @@
                 <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
             </div>
         </div>
-        <nav class="space-y-1">
-            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
-                <i class="fa-solid fa-chart-pie group-hover:text-purple-400"></i> Dashboard Matrix
-            </a>
-            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
-                <i class="fa-solid fa-user-plus group-hover:text-purple-400"></i> Capital Disbursement
-            </a>
-            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-xs font-medium transition-all group">
-                <i class="fa-solid fa-address-book"></i> Customer Ledger
-            </a>
-            <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all">
-                <i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal
-            </a>
-        </nav>
+       <!-- Only inside transaction-report.html Sidebar Links Container Module Layout -->
+<nav class="space-y-1">
+    <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-chart-pie"></i> Dashboard Matrix</a>
+    <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
+    <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
+    <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal</a>
+    
+    <!-- Active Highlight Switch Matrix Activated -->
+    <a href="transaction-report.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all duration-200"><i class="fa-solid fa-file-invoice-dollar"></i> Collection Reports</a>
+</nav>
     </aside>
 
     <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
@@ -281,6 +277,23 @@
             alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} logged successfully!\nRef No: ${refNo || 'N/A'}`);
             clearTransactionTerminal();
         }
+
+// Sample integration function snippet inside transaction handling event logic tracking:
+let existingLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
+let newTransactionLogEntry = {
+    accountNo: targetAccountNoField, // User inputs validation account matrix reference tags
+    paymentMode: selectedMode, // UPI / Cash variables configurations selection routing module
+    amountCollected: parseFloat(enteredCollectionAmount), 
+    referenceNo: document.getElementById('referenceNo').value || 'N/A (Cash Transaction)',
+    timestamp: new Date().toISOString() // Dynamic Realtime timestamp injection module matrix
+};
+existingLogs.push(newTransactionLogEntry);
+localStorage.setItem('vp_local_transactions', JSON.stringify(existingLogs));
+
+
+
+
+        
     </script>
 </body>
 </html>
