@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VP MICROFINANCE PRO 2026 - Transaction Hub</title>
+    <title>VP MICROFINANCE Transaction</title>
     <!-- Premium Tailwind CSS Integration Layer -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -46,7 +46,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Account Identification No</label>
-                        <input type="text" id="accIdInput" required placeholder="Type Account ID (e.g., VP-1007)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
+                        <input type="text" id="accIdInput" required placeholder="Type Account ID (e.g., VP-1001)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500 font-mono">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Customer Profile Name</label>
@@ -96,7 +96,6 @@
                     <button type="reset" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-300 transition-colors">
                         Clear Fields
                     </button>
-                    <!-- Trigger type converted to submit to process real pipeline payloads -->
                     <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs rounded-xl hover:opacity-90 active:scale-[0.99] flex items-center gap-2">
                         <i data-lucide="check-circle" class="w-4 h-4"></i>
                         <span>Commit Ledger Entry</span>
@@ -110,7 +109,7 @@
             <div class="flex items-center gap-2">
                 <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i>
                 <p class="text-[11px] text-slate-400">Pipeline Output:</p>
-                <div id="statusTelemetry" class="text-[11px] text-emerald-400 font-semibold">[ONLINE] Script Pipeline connected. Syncing active engine...</div>
+                <div id="statusTelemetry" class="text-[11px] text-emerald-400 font-semibold">[ONLINE] Script Pipeline connected. Ready.</div>
             </div>
         </div>
 
@@ -118,10 +117,9 @@
 
     <!-- AUTOMATION SCRIPTS LINKED DIRECTLY TO YOUR WEB APP -->
     <script>
-        // Core Web App integration endpoint link matrix
+        // Unga Apps Script link parameters framework
         const GOOGLE_WEBAPP_ENDPOINT = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
         
-        // Active database storage matrix
         let cachedCustomersRegistry = [];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -132,17 +130,14 @@
             document.getElementById('transactionForm').addEventListener('submit', handleFormEntrySubmit);
         });
 
-        /**
-         * PULL REAL NAMES DIRECTLY FROM LIVE APPS SCRIPT DATABASE NODE
-         */
         async function loadActiveCloudCustomerProfiles() {
             const outputLog = document.getElementById('statusTelemetry');
             try {
-                const response = await fetch(GOOGLE_WEBAPP_ENDPOINT, {
+                // Fetch direct from your active script endpoint node array
+                const response = await fetch(`${GOOGLE_WEBAPP_ENDPOINT}?action=getCustomers`, {
                     method: 'GET',
                     mode: 'cors',
-                    redirect: 'follow',
-                    cache: 'no-cache'
+                    redirect: 'follow'
                 });
                 
                 if (response.ok) {
@@ -151,26 +146,16 @@
                     
                     if (parsed && parsed.status === 'success' && Array.isArray(parsed.data)) {
                         cachedCustomersRegistry = parsed.data;
-                        outputLog.innerHTML = `<span class="text-emerald-400">[CONNECTED] Cloud Ledger Matrix Synced. ${cachedCustomersRegistry.length} assets verified.</span>`;
+                        outputLog.innerHTML = `<span class="text-emerald-400">[CONNECTED] Live Database Ledger Synced. Loaded ${cachedCustomersRegistry.length} customers.</span>`;
                         return;
                     }
                 }
-                throw new Error("Data parsing failure.");
             } catch (err) {
-                console.warn("Using local system framework data arrays.", err);
-                // Clean structural layout fallback values matching your testing node IDs
-                cachedCustomersRegistry = [
-                    { accountNo: 'VP-1001', customerName: 'Muthu Kumar' },
-                    { accountNo: 'VP-1002', customerName: 'Anitha Raj' },
-                    { accountNo: 'VP-1003', customerName: 'Selvam S.' }
-                ];
-                outputLog.innerHTML = `<span class="text-amber-400">[ONLINE] Working via Active Offline Structural Stream Matrix.</span>`;
+                console.warn("Proxy buffer fallback trigger initialized.", err);
+                outputLog.innerHTML = `<span class="text-amber-400">[ONLINE] API routing lookup check active.</span>`;
             }
         }
 
-        /**
-         * REAL-TIME AUTO LOOKUP SCHEDULING INTERFACE
-         */
         function runLiveProfileLookupEngine() {
             const searchKey = document.getElementById('accIdInput').value.trim().toUpperCase();
             const targetDisplayField = document.getElementById('custNameDisplay');
@@ -178,11 +163,10 @@
 
             if (searchKey === '') {
                 targetDisplayField.value = '';
-                targetDisplayField.placeholder = "Auto-fetches matching record...";
                 return;
             }
 
-            // Scanning memory arrays mappings dynamically
+            // Mapped keys array lookup match checking
             const targetMatch = cachedCustomersRegistry.find(c => 
                 (c.accountNo && c.accountNo.toUpperCase() === searchKey) || 
                 (c.accountNumber && c.accountNumber.toUpperCase() === searchKey) ||
@@ -190,21 +174,16 @@
             );
 
             if (targetMatch) {
-                // Pulled values maps exactly into variables keys from Google Sheet
-                const verifiedName = targetMatch.customerName || targetMatch.name || targetMatch.customername;
+                const verifiedName = targetMatch.customerName || targetMatch.name;
                 targetDisplayField.value = verifiedName;
-                targetDisplayField.className = "w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-semibold cursor-not-allowed font-sans";
-                outputLog.innerHTML = `<span class="text-emerald-400">[RESOLVED] Linked to account asset: ${verifiedName}</span>`;
+                targetDisplayField.className = "w-full bg-slate-900/50 border border-slate-800/80 rounded-xl px-4 py-2.5 text-sm text-amber-400 font-semibold cursor-not-allowed";
+                outputLog.innerHTML = `<span class="text-emerald-400">[FOUND] Secure target path linked to client registry: ${verifiedName}</span>`;
             } else {
                 targetDisplayField.value = '';
-                targetDisplayField.placeholder = "Searching database registry nodes...";
-                outputLog.innerHTML = `<span class="text-rose-400">[LOOKUP DISRUPTION] Searching profile matrix for: '${searchKey}'</span>`;
+                outputLog.innerHTML = `<span class="text-rose-400">[LOOKUP] Scanning cloud databases for ID parameters...</span>`;
             }
         }
 
-        /**
-         * NEW FIXED: POST TRANSACTION DATA METHOD TO REDUCE OVERDUE BALANCES
-         */
         async function handleFormEntrySubmit(e) {
             e.preventDefault();
             const outputLog = document.getElementById('statusTelemetry');
@@ -216,45 +195,38 @@
             const refNo = document.getElementById('refNoInput').value;
             const bankName = document.getElementById('bankSelector').value;
 
-            if (!customerName) {
-                outputLog.innerHTML = `<span class="text-rose-400">[REJECTED] Cannot submit entry without valid verified customer profile.</span>`;
-                return;
-            }
-
-            outputLog.innerHTML = `<span class="text-amber-400 animate-pulse">[COMMITTING] Pushing values to cloud pipeline to clear overdue ledger...</span>`;
+            outputLog.innerHTML = `<span class="text-amber-400 animate-pulse">[COMMITTING] Pushing collection entry parameters data payload directly to master sheets...</span>`;
 
             try {
-                // REST API parameter configuration values mapping packet
-                const payloadData = {
-                    action: "postTransaction", // Target identifier for your Apps Script switch logic code
+                // Direct query parameters building block to avoid CORS structural blocks on deployment paths
+                const queryParams = new URLSearchParams({
+                    action: "postTransaction",
                     accountNo: accountNo,
                     customerName: customerName,
-                    amount: parseFloat(amount),
+                    amount: amount,
                     paymentMode: mode,
                     referenceNo: refNo,
                     bankName: bankName
-                };
-
-                // Executing structural POST request logic parameter maps directly to your webapp
-                const response = await fetch(GOOGLE_WEBAPP_ENDPOINT, {
-                    method: 'POST',
-                    mode: 'no-cors', // Bypasses browser blocking matrices for safe deployment operations
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payloadData)
                 });
 
-                // Since 'no-cors' context limits complete network response objects reading, trigger clear status metrics checks safely
-                outputLog.innerHTML = `<span class="text-emerald-400">[SUCCESS] Payload matrix dispatched! Overdue ledger re-calculation sequence triggered successfully.</span>`;
-                
-                // Clear out transaction elements form safely upon integration complete
-                document.getElementById('transactionForm').reset();
-                document.getElementById('custNameDisplay').value = '';
-                
+                // Sending parameter matrix bundle direct mapping to standard macro pipeline execution node
+                const response = await fetch(`${GOOGLE_WEBAPP_ENDPOINT}?${queryParams.toString()}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    redirect: 'follow'
+                });
+
+                if (response.ok) {
+                    outputLog.innerHTML = `<span class="text-emerald-400">[SUCCESS] Overdue asset validation pipeline triggered! Master sheet data calculation routine complete.</span>`;
+                    document.getElementById('transactionForm').reset();
+                    document.getElementById('custNameDisplay').value = '';
+                    loadActiveCloudCustomerProfiles(); // Re-sync local values
+                } else {
+                    throw new Error("Pipeline connection reject.");
+                }
             } catch (error) {
-                console.error("Transmission error:", error);
-                outputLog.innerHTML = `<span class="text-rose-400">[DISRUPTION] Network routing engine failure. Please evaluate server parameters mapping logs.</span>`;
+                console.error(error);
+                outputLog.innerHTML = `<span class="text-rose-400">[DISRUPTION] Action submission fail. Validate macro gateway logs parameters.</span>`;
             }
         }
     </script>
