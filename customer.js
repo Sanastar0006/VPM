@@ -43,7 +43,7 @@ function initializeTrackingAccountNumber() {
 
 function runLiveMicrofinanceCalculator() {
     const principal = parseFloat(document.getElementById('principal').value) || 0;
-    const rate = parseFloat(document.getElementById('interestRate').value) || 0; // Fixed key property selection mapping
+    const rate = parseFloat(document.getElementById('interestRate').value) || 0; 
     const duration = parseInt(document.getElementById('duration').value) || 0;
     const frequency = document.getElementById('frequency').value;
     const startDateVal = document.getElementById('startDate').value;
@@ -78,10 +78,16 @@ function runLiveMicrofinanceCalculator() {
 function saveCustomerDataToServerPipeline() {
     const submitBtn = document.getElementById('submitBtn');
     
+    // Safely extract input fields with fallback handling
+    const aadharInput = document.getElementById('aadharNo');
+    const panInput = document.getElementById('panNo');
+
     const customerPayload = {
         accountNo: document.getElementById('accountNo').value,
         customerName: document.getElementById('customerName').value,
         mobile: document.getElementById('mobile').value,
+        aadharNo: aadharInput ? aadharInput.value.trim() : '',
+        panNo: panInput ? panInput.value.trim().toUpperCase() : '',
         principal: parseFloat(document.getElementById('principal').value) || 0,
         interestRate: parseFloat(document.getElementById('interestRate').value) || 0,
         frequency: document.getElementById('frequency').value,
