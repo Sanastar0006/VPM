@@ -75,56 +75,94 @@ function runLiveMicrofinanceCalculator() {
     }
 }
 
-function saveCustomerDataToServerPipeline() {
+// Helper utility to convert file inputs into Base64 strings safely
+function fileToBase64(fileInput) {
+    return new Promise((resolve) => {
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+            resolve('');
+            return;
+        }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+    });
+}
+
+async function saveCustomerDataToServerPipeline() {
     const submitBtn = document.getElementById('submitBtn');
     
-    // Safely extract input fields with fallback handling
-    const aadharInput = document.getElementById('aadharNo');
-    const panInput = document.getElementById('panNo');
-
-    const customerPayload = {
-        accountNo: document.getElementById('accountNo').value,
-        customerName: document.getElementById('customerName').value,
-        mobile: document.getElementById('mobile').value,
-        aadharNo: aadharInput ? aadharInput.value.trim() : '',
-        panNo: panInput ? panInput.value.trim().toUpperCase() : '',
-        principal: parseFloat(document.getElementById('principal').value) || 0,
-        interestRate: parseFloat(document.getElementById('interestRate').value) || 0,
-        frequency: document.getElementById('frequency').value,
-        duration: parseInt(document.getElementById('duration').value) || 0,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        emi: parseFloat(document.getElementById('lblEMI').innerText.replace('₹', '').replace(/,/g, '')) || 0,
-        totalOutstanding: parseFloat(document.getElementById('lblTotalRepayable').innerText.replace('₹', '').replace(/,/g, '')) || 0
-    };
-
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Dispatching to Cloud Server...`;
+    submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing Images & Dispatching...`;
 
-    // Local Storage dynamic fallback cache injection protocol
-    let localLedger = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-    localLedger.unshift(customerPayload);
-    localStorage.setItem('vp_local_customers', JSON.stringify(localLedger));
+    try {
+        // Read uploaded images concurrently using Base64 helper
+        const [appImgData, aadharImgData, panImgData] = await Promise.all([
+            fileToBase64(document.getElementById('imgApplication')),
+            fileToBase64(document.getElementById('imgAadhar')),
+            fileToBase64(document.getElementById('imgPan'))
+        ]);
 
-    // URLSearchParams Method parsing format targeting deployment setup
-    const finalEndpointUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
+        const aadharInput = document.getElementById('aadharNo');
+        const panInput = document.getElementById('panNo');
+        const addressInput = document.getElementById('customerAddress');
+        const landmarkInput = document.getElementById('customerLandmark');
 
-    fetch(finalEndpointUrl, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache'
-    })
-    .then(res => res.json())
-    .then(result => {
-        if (result && result.status === 'success') {
-            alert('🎉 Success Machi! Ledger account perfectly pushed to Google Sheets!');
-        }
-        window.location.href = "customer-list.html";
-    })
-    .catch(err => {
-        console.warn("Server response active status routing bypass:", err);
-        window.location.href = "customer-list.html";
-    });
+        const customerPayload = {
+            accountNo: document.getElementById('accountNo').value,
+            customerName: document.getElementById('customerName').value,
+            mobile: document.getElementById('mobile').value,
+            aadharNo: aadharInput ? aadharInput.value.trim() : '',
+            panNo: panInput ? panInput.value.trim().toUpperCase() : '',
+            address: addressInput ? addressInput.value.trim() : '',
+            landmark: landmarkInput ? landmarkInput.value.trim() : '',
+            principal: parseFloat(document.getElementById('principal').value) || 0,
+            interestRate: parseFloat(document.getElementById('interestRate').value) || 0,
+            frequency: document.getElementById('frequency').value,
+            duration: parseInt(document.getElementById('duration').value) || 0,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value,
+            emi: parseFloat(document.getElementById('lblEMI').innerText.replace('₹', '').replace(/,/g, '')) || 0,
+            totalOutstanding: parseFloat(document.getElementById('lblTotalRepayable').innerText.replace('₹', '').replace(/,/g, '')) || 0,
+            
+            // Base64 Encoded Image Records
+            imgApplication: appImgData,
+            imgAadhar: aadharImgData,
+            imgPan: panImgData
+        };
+
+        // Local Storage dynamic fallback cache injection protocol
+        let localLedger = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+        localLedger.unshift(customerPayload);
+        localStorage.setItem('vp_local_customers', JSON.stringify(localLedger));
+
+        // Send payload via POST/GET fetch request
+        const finalEndpointUrl = `${GOOGLE_SCRIPT_WEBAPP_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'saveCustomer', data: customerPayload }))}`;
+
+        fetch(finalEndpointUrl, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result && result.status === 'success') {
+                alert('🎉 Success Machi! Customer details and uploaded images pushed successfully!');
+            }
+            window.location.href = "customer-list.html";
+        })
+        .catch(err => {
+            console.warn("Server response active status routing bypass:", err);
+            window.location.href = "customer-list.html";
+        });
+
+    } catch (error) {
+        console.error("Error saving customer pipeline:", error);
+        alert("Something went wrong while processing images. Please try again.");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Disburse to Cloud Sheets`;
+    }
 }
 
 window.saveCustomerToSheet = saveCustomerDataToServerPipeline;
