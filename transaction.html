@@ -32,7 +32,9 @@
             <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
             <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
             <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg transition-all duration-200"><i class="fa-solid fa-money-bill-transfer"></i> EMI Collection Terminal</a>
-            <a href="transaction-report.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-file-invoice-dollar"></i> Collection Reports</a>
+            <a href="receipt.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-receipt"></i> Receipts Ledger</a>
+            <a href="cash-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-wallet"></i> Cash Book</a>
+            <a href="bank-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium transition-all duration-200"><i class="fa-solid fa-building-columns"></i> Bank Book</a>
         </nav>
     </aside>
 
@@ -87,7 +89,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-4">
+                <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-4">
                     <div>
                         <label class="block text-[10px] text-amber-400 font-semibold mb-1 uppercase tracking-wider">Payment Mode Channel</label>
                         <select id="paymentMode" required onchange="evaluatePaymentChannelView()" class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
@@ -105,36 +107,55 @@
                             <input type="number" step="0.01" id="collectedAmount" required placeholder="Type collected amount" class="w-full pl-7 pr-3 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono font-bold text-xs focus:outline-none focus:border-purple-500 transition-all">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-[10px] text-amber-400 font-semibold mb-1 uppercase tracking-wider">Made By (Staff / Collector)</label>
+                        <select id="madeBy" required class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
+                            <option value="" disabled selected>Select Agent</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Field Officer A">Field Officer A</option>
+                            <option value="Field Officer B">Field Officer B</option>
+                            <option value="Collection Staff">Collection Staff</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Dynamic Non-Cash Container (Reference No & Bank Selector) -->
-                <div id="nonCashContainer" class="hidden grid grid-cols-2 gap-4 border-t border-white/5 pt-4 transition-all duration-300">
-                    <div>
-                        <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Reference No / Txn ID</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-receipt"></i></span>
-                            <input type="text" id="referenceNo" placeholder="Enter UPI Ref, UTR, etc." class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
+                <!-- Dynamic Non-Cash Container -->
+                <div id="nonCashContainer" class="hidden space-y-4 border-t border-white/5 pt-4 transition-all duration-300">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Reference No / Txn ID</label>
+                            <input type="text" id="referenceNo" placeholder="Enter UPI Ref, UTR, etc." class="w-full px-3 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Receiving Bank Channel</label>
+                            <select id="bankName" onchange="autoPopulateBankMeta()" class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
+                                <option value="" disabled selected>Select Bank</option>
+                                <option value="State Bank of India">State Bank of India (SBI)</option>
+                                <option value="HDFC Bank">HDFC Bank</option>
+                                <option value="ICICI Bank">ICICI Bank</option>
+                                <option value="Axis Bank">Axis Bank</option>
+                                <option value="Indian Bank">Indian Bank</option>
+                                <option value="Canara Bank">Canara Bank</option>
+                                <option value="Tamilnad Mercantile Bank">Tamilnad Mercantile Bank (TMB)</option>
+                            </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Receiving Bank Channel</label>
-                        <select id="bankName" class="w-full px-3 py-2.5 bg-[#0f1524] border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all cursor-pointer">
-                            <option value="" disabled selected>Select Bank</option>
-                            <option value="State Bank of India">State Bank of India (SBI)</option>
-                            <option value="HDFC Bank">HDFC Bank</option>
-                            <option value="ICICI Bank">ICICI Bank</option>
-                            <option value="Axis Bank">Axis Bank</option>
-                            <option value="Indian Bank">Indian Bank</option>
-                            <option value="Canara Bank">Canara Bank</option>
-                            <option value="Tamilnad Mercantile Bank">Tamilnad Mercantile Bank (TMB)</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">IFSC Code</label>
+                            <input type="text" id="ifscCode" placeholder="Auto / Custom IFSC" class="w-full px-3 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1 uppercase tracking-wider">Bank Branch</label>
+                            <input type="text" id="bankBranch" placeholder="Branch Name" class="w-full px-3 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-white/5 pt-4 mt-2">
                     <button type="reset" onclick="clearTransactionTerminal()" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl text-xs font-medium transition-all">Clear Terminal</button>
                     <button type="submit" class="px-6 py-2.5 yono-gradient text-white rounded-xl text-xs font-bold tracking-wide shadow-lg hover:opacity-90 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-check-double"></i> Authorize Collection Ledger
+                        <i class="fa-solid fa-check-double"></i> Authorize & Save Entry
                     </button>
                 </div>
             </form>
@@ -144,11 +165,20 @@
     <script>
         const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
 
+        const BANK_METADATA = {
+            "State Bank of India": { ifsc: "SBIN0001234", branch: "Main Branch" },
+            "HDFC Bank": { ifsc: "HDFC0000456", branch: "Metro Branch" },
+            "ICICI Bank": { ifsc: "ICIC0000789", branch: "Central Branch" },
+            "Axis Bank": { ifsc: "UTIB0000321", branch: "Town Branch" },
+            "Indian Bank": { ifsc: "IDIB0001122", branch: "West Branch" },
+            "Canara Bank": { ifsc: "CNRB0003344", branch: "East Branch" },
+            "Tamilnad Mercantile Bank": { ifsc: "TMBL0000555", branch: "South Branch" }
+        };
+
         function toggleSidebarLayout() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         }
 
-        // 1. Conditional Layout Logic for Reference & Bank Fields
         function evaluatePaymentChannelView() {
             const currentMode = document.getElementById('paymentMode').value;
             const nonCashContainer = document.getElementById('nonCashContainer');
@@ -163,19 +193,25 @@
                 nonCashContainer.classList.add('hidden');
                 refInput.required = false;
                 bankInput.required = false;
-                refInput.value = ''; 
-                bankInput.value = '';
+                refInput.value = ''; bankInput.value = '';
+                document.getElementById('ifscCode').value = '';
+                document.getElementById('bankBranch').value = '';
             }
         }
 
-        // 2. Global Flexible Array Fallback Search Engine (FILTERED FOR LOAN APPROVED ONLY)
+        function autoPopulateBankMeta() {
+            const bName = document.getElementById('bankName').value;
+            if(BANK_METADATA[bName]) {
+                document.getElementById('ifscCode').value = BANK_METADATA[bName].ifsc;
+                document.getElementById('bankBranch').value = BANK_METADATA[bName].branch;
+            }
+        }
+
         function triggerAccountSearchPipeline() {
             const inputVal = document.getElementById('searchAccount').value.toUpperCase().trim();
             const dropdown = document.getElementById('searchDropdown');
-            
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             
-            // STRICT FILTER: Check for LOAN APPROVED status only
             let approvedCustomers = customers.filter(c => {
                 let statusVal = (c.status || c.approvalStatus || c.loanStatus || '').toUpperCase();
                 return statusVal === 'LOAN APPROVED';
@@ -216,7 +252,6 @@
             dropdown.classList.remove('hidden');
         }
 
-        // 3. Robust Object Property Extraction Handler
         function selectTargetAccountProfile(customer) {
             let correctAcNo = customer.accountNo || customer.accountNumber || 'VP-N/A';
             let correctName = customer.customerName || customer.name || 'N/A';
@@ -229,18 +264,14 @@
             document.getElementById('loanAmount').value = parseFloat(correctPrincipal).toLocaleString('en-IN', {minimumFractionDigits: 2});
             document.getElementById('emiAmount').value = parseFloat(correctEmi).toFixed(2);
             document.getElementById('emiDate').value = correctDate;
-            
             document.getElementById('collectedAmount').value = parseFloat(correctEmi) || '';
             document.getElementById('searchDropdown').classList.add('hidden');
         }
 
-        // Dismiss panels
         document.addEventListener('click', (e) => {
             const dropdown = document.getElementById('searchDropdown');
             const searchInput = document.getElementById('searchAccount');
-            if (e.target !== dropdown && e.target !== searchInput) {
-                dropdown.classList.add('hidden');
-            }
+            if (e.target !== dropdown && e.target !== searchInput) dropdown.classList.add('hidden');
         });
 
         function clearTransactionTerminal() {
@@ -249,7 +280,6 @@
             document.getElementById('transactionForm').reset();
         }
 
-        // 4. Capturing Exact Evaluated Dropdown Value Pipeline
         function executeTransactionCommit(e) {
             e.preventDefault();
             
@@ -257,67 +287,70 @@
             const name = document.getElementById('customerName').value;
             const mode = document.getElementById('paymentMode').value;
             const amt = parseFloat(document.getElementById('collectedAmount').value) || 0;
+            const madeBy = document.getElementById('madeBy').value;
             const refNo = document.getElementById('referenceNo').value.trim();
-            
-            // Fixed extraction logic for bank selector element explicitly
-            const bankElement = document.getElementById('bankName');
-            const rawBankName = bankElement ? bankElement.value : '';
+            const bankName = document.getElementById('bankName').value;
+            const ifsc = document.getElementById('ifscCode').value;
+            const branch = document.getElementById('bankBranch').value;
 
             if(!name || name === 'Auto-populated Name') {
-                alert("⚠️ Error Machi! Choose a valid registered account from the list.");
+                alert("⚠️ Choose a valid registered account!");
                 return;
             }
 
-            // Safety Double-Check for LOAN APPROVED before authorizing transaction
-            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-            let index = customers.findIndex(c => (c.accountNo || c.accountNumber) === acNo);
+            const today = new Date().toISOString().split('T')[0];
+            const receiptNo = "REC-" + Date.now().toString().slice(-6);
+            const voucherNo = "VOUCH-" + Date.now().toString().slice(-5);
 
-            if(index !== -1) {
-                let statusVal = (customers[index].status || customers[index].approvalStatus || customers[index].loanStatus || '').toUpperCase();
-                if (statusVal !== 'LOAN APPROVED') {
-                    alert("⚠️ Unauthorized Machi! This account is rejected or not approved for collection.");
-                    return;
-                }
+            // 1. Receipt Payload
+            let receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            let receiptObj = {
+                receiptNo: receiptNo,
+                date: today,
+                accountNo: acNo,
+                customerName: name,
+                paymentMode: mode,
+                amount: amt,
+                madeBy: madeBy,
+                refNo: refNo,
+                bankName: bankName,
+                ifsc: ifsc,
+                branch: branch
+            };
+            receipts.push(receiptObj);
+            localStorage.setItem('vp_receipts', JSON.stringify(receipts));
 
-                let currentOutstanding = parseFloat(customers[index].totalOutstanding || customers[index].outstanding || 0);
-                customers[index].totalOutstanding = Math.max(0, currentOutstanding - amt);
-                localStorage.setItem('vp_local_customers', JSON.stringify(customers));
+            // 2. Routing to Cash Book or Bank Book
+            if(mode === 'Cash') {
+                let cashEntries = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
+                cashEntries.push({
+                    date: today,
+                    voucherNo: voucherNo,
+                    particulars: `EMI Collected from ${name} (${acNo})`,
+                    paymentMode: 'Cash',
+                    amount: amt,
+                    type: 'CREDIT', // Credit to cash box
+                    madeBy: madeBy
+                });
+                localStorage.setItem('vp_cash_book', JSON.stringify(cashEntries));
+            } else {
+                let bankEntries = JSON.parse(localStorage.getItem('vp_bank_book')) || [];
+                bankEntries.push({
+                    date: today,
+                    voucherNo: voucherNo,
+                    particulars: `EMI Collected from ${name} (${acNo}) - Ref: ${refNo}`,
+                    paymentMode: mode,
+                    amount: amt,
+                    type: 'CREDIT',
+                    madeBy: madeBy,
+                    bankName: bankName
+                });
+                localStorage.setItem('vp_bank_book', JSON.stringify(bankEntries));
             }
 
-            // Write Transaction Log History (Including Bank Data)
-            let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
-            let dynamicTransactionAuditPayload = {
-                accountNo: acNo.toUpperCase(),
-                paymentMode: mode,
-                amountCollected: amt,
-                referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
-                bankName: mode === 'Cash' ? 'N/A' : (rawBankName || 'Not Specified'),
-                timestamp: new Date().toISOString()
-            };
-            activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
-            localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
-
-            // Cloud Sync Object Mapping explicitly
-            const payload = {
-                action: 'saveTransaction',
-                accountNo: acNo.toUpperCase(),
-                paymentMode: mode,
-                amountCollected: amt,
-                referenceNo: mode === 'Cash' ? 'N/A (Cash Transaction)' : (refNo || 'UPI Transaction'),
-                bankName: mode === 'Cash' ? 'N/A' : (rawBankName || 'Not Specified'),
-                timestamp: new Date().toISOString()
-            };
-
-            const remoteSyncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify(payload))}`;
-
-            fetch(remoteSyncEndpoint, { method: 'GET', mode: 'cors' })
-            .then(res => res.json())
-            .then(resData => {
-                if(resData.status === 'success') console.log("Google Sheets logging synchronization active!");
-            }).catch(err => console.warn("Cloud connection latency bypassed:", err));
-
-            alert(`✅ Success Machi!\n\nTransaction authorized for ${acNo}.\n₹${amt} via ${mode} (${mode === 'Cash' ? 'Cash' : rawBankName}) logged successfully!`);
+            alert(`✅ Transaction Successful!\nReceipt No: ${receiptNo}\nVoucher No: ${voucherNo}\nSaved to ${mode === 'Cash' ? 'Cash Book' : 'Bank Book'} & Receipts!`);
             clearTransactionTerminal();
+            window.location.href = "receipt.html";
         }
     </script>
 </body>
