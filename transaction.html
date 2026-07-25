@@ -168,26 +168,32 @@
             }
         }
 
-        // 2. Global Flexible Array Fallback Search Engine
+        // 2. Global Flexible Array Fallback Search Engine (FILTERED FOR LOAN APPROVED ONLY)
         function triggerAccountSearchPipeline() {
             const inputVal = document.getElementById('searchAccount').value.toUpperCase().trim();
             const dropdown = document.getElementById('searchDropdown');
             
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             
-            if (customers.length === 0) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No registered customers in LocalStorage matrix!</div>`;
+            // STRICT FILTER: Check for LOAN APPROVED status only
+            let approvedCustomers = customers.filter(c => {
+                let statusVal = (c.status || c.approvalStatus || c.loanStatus || '').toUpperCase();
+                return statusVal === 'LOAN APPROVED';
+            });
+
+            if (approvedCustomers.length === 0) {
+                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No active approved customers found!</div>`;
                 dropdown.classList.remove('hidden');
                 return;
             }
 
-            let filtered = customers.filter(c => {
+            let filtered = approvedCustomers.filter(c => {
                 let currentAcNo = (c.accountNo || c.accountNumber || '').toUpperCase();
                 return inputVal === '' || currentAcNo.includes(inputVal);
             });
 
             if (filtered.length === 0) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">Machi, no matches found!</div>`;
+                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">Machi, no matching approved accounts found!</div>`;
                 dropdown.classList.remove('hidden');
                 return;
             }
@@ -243,7 +249,7 @@
             document.getElementById('transactionForm').reset();
         }
 
-        // 4. FIX: Capturing Exact Evaluated Dropdown Value Pipeline
+        // 4. Capturing Exact Evaluated Dropdown Value Pipeline
         function executeTransactionCommit(e) {
             e.preventDefault();
             
@@ -262,17 +268,23 @@
                 return;
             }
 
-            // A. Update Customer Outstanding Balance Matrix
+            // Safety Double-Check for LOAN APPROVED before authorizing transaction
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let index = customers.findIndex(c => (c.accountNo || c.accountNumber) === acNo);
 
             if(index !== -1) {
+                let statusVal = (customers[index].status || customers[index].approvalStatus || customers[index].loanStatus || '').toUpperCase();
+                if (statusVal !== 'LOAN APPROVED') {
+                    alert("⚠️ Unauthorized Machi! This account is rejected or not approved for collection.");
+                    return;
+                }
+
                 let currentOutstanding = parseFloat(customers[index].totalOutstanding || customers[index].outstanding || 0);
                 customers[index].totalOutstanding = Math.max(0, currentOutstanding - amt);
                 localStorage.setItem('vp_local_customers', JSON.stringify(customers));
             }
 
-            // B. Write Transaction Log History (Including Bank Data)
+            // Write Transaction Log History (Including Bank Data)
             let activeTransactionRecordLogs = JSON.parse(localStorage.getItem('vp_local_transactions')) || [];
             let dynamicTransactionAuditPayload = {
                 accountNo: acNo.toUpperCase(),
@@ -285,7 +297,7 @@
             activeTransactionRecordLogs.push(dynamicTransactionAuditPayload);
             localStorage.setItem('vp_local_transactions', JSON.stringify(activeTransactionRecordLogs));
 
-            // C. Cloud Sync Object Mapping explicitly
+            // Cloud Sync Object Mapping explicitly
             const payload = {
                 action: 'saveTransaction',
                 accountNo: acNo.toUpperCase(),
