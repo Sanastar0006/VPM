@@ -2,70 +2,163 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipts Hub | VP MICROFINANCE PRO 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #0b0f19; color: #e2e8f0; }
+        body { font-family: 'Poppins', sans-serif; background: #060814; color: #e2e8f0; }
+        .yono-gradient { background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%); }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            #viewModal { position: absolute !important; background: white !important; padding: 0 !important; }
+            #receiptPrintArea { border: none !important; box-shadow: none !important; width: 100% !important; }
+        }
     </style>
 </head>
-<body class="p-6">
-    <div class="max-w-7xl mx-auto space-y-6">
-        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-receipt text-purple-500"></i> Customer Collections Receipts Registry</h2>
-        <div class="glass-card rounded-2xl p-4 overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="text-slate-400 border-b border-white/10 uppercase">
-                    <tr>
-                        <th class="p-3">Date</th>
-                        <th class="p-3">Receipt No</th>
-                        <th class="p-3">Account No</th>
-                        <th class="p-3">Customer Name</th>
-                        <th class="p-3">Mode</th>
-                        <th class="p-3">Amount</th>
-                        <th class="p-3 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="receiptTableBody" class="divide-y divide-white/5"></tbody>
-            </table>
+<body class="min-h-screen bg-[#060814] text-slate-100 flex">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 glass-card fixed inset-y-0 left-0 z-50 p-4 m-3 rounded-2xl h-[calc(100vh-24px)] transition-transform duration-300 lg:translate-x-0 -translate-x-full lg:static no-print">
+        <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
+            <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md">VP</div>
+            <div>
+                <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
+                <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
+            </div>
         </div>
-    </div>
+
+        <nav class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-chart-pie"></i> Dashboard Matrix</a>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
+            <a href="passbook.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-book-open"></i> Customer Passbook</a>
+            <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-money-bill-transfer"></i> Entry Terminal</a>
+            <a href="receipt.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg"><i class="fa-solid fa-receipt"></i> Receipts Hub</a>
+            <a href="cash-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-wallet"></i> Cash Book</a>
+            <a href="bank-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-building-columns"></i> Bank Book</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
+        <header class="flex items-center justify-between mb-6 pb-4 border-b border-white/5 no-print">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebarLayout()" class="lg:hidden p-2 text-slate-400 hover:text-white glass-card rounded-xl text-xs"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <h2 class="text-base font-semibold text-white tracking-wide">Receipts Hub & Collections Registry</h2>
+                    <p class="text-xs text-slate-400">Master Repository for Customer Payment Receipts & Passbook Sync</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search / Filter Area -->
+        <div class="max-w-7xl mx-auto space-y-6">
+            <div class="glass-card rounded-2xl p-4 flex flex-wrap gap-4 items-center justify-between no-print">
+                <div class="relative flex-1 min-w-[240px]">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" id="receiptSearch" oninput="loadReceipts()" placeholder="Search Receipt No, Account No, or Customer Name..." class="w-full pl-9 pr-4 py-2 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs">
+                </div>
+                <div class="text-xs text-slate-400 font-mono">
+                    Total Records: <span id="totalCount" class="text-purple-400 font-bold">0</span>
+                </div>
+            </div>
+
+            <!-- Receipts Table -->
+            <div class="glass-card rounded-2xl p-4 overflow-x-auto border border-white/5">
+                <table class="w-full text-left text-xs">
+                    <thead class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                        <tr>
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Receipt No</th>
+                            <th class="p-3">Account No</th>
+                            <th class="p-3">Customer Name</th>
+                            <th class="p-3">Payment Channel</th>
+                            <th class="p-3">Collected Amount</th>
+                            <th class="p-3">Collector</th>
+                            <th class="p-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receiptTableBody" class="divide-y divide-white/5 font-mono"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
     <!-- Modal for Viewing / Printing Duplicate Receipt -->
-    <div id="viewModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4">
-        <div id="receiptPrintArea" class="bg-white text-black p-6 rounded-xl max-w-md w-full relative">
-            <div id="watermark" class="absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-200/50 rotate-45 select-none pointer-events-none">WATERMARK</div>
-            <h3 class="text-center font-bold text-lg uppercase border-b pb-2">VP Microfinance Pro</h3>
-            <div id="modalContent" class="py-4 space-y-2 text-xs"></div>
-            <div class="flex justify-end gap-2 mt-4 no-print">
-                <button onclick="closeModal()" class="px-3 py-1 bg-gray-300 text-black rounded">Close</button>
-                <button onclick="window.print()" class="px-3 py-1 bg-purple-600 text-white rounded">Print</button>
+    <div id="viewModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+        <div id="receiptPrintArea" class="bg-white text-slate-900 p-6 rounded-2xl max-w-md w-full relative shadow-2xl border border-slate-200">
+            <div id="watermark" class="absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-slate-200/60 rotate-45 select-none pointer-events-none uppercase">WATERMARK</div>
+            
+            <div class="text-center border-b pb-3 mb-3">
+                <h3 class="font-bold text-base text-purple-900 uppercase tracking-wider">VP Microfinance Pro</h3>
+                <p class="text-[10px] text-slate-500">Official Payment Acknowledgement Receipt</p>
+            </div>
+            
+            <div id="modalContent" class="py-2 space-y-2 text-xs"></div>
+
+            <div class="border-t pt-3 mt-4 text-[10px] text-slate-500 text-center">
+                <p>Thank you for your payment!</p>
+                <p class="font-mono text-[9px] mt-1">Computer Generated Receipt • VP Microfinance 2026 System</p>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4 no-print border-t pt-3">
+                <button onclick="closeModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-semibold">Close</button>
+                <button onclick="window.print()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        function toggleSidebarLayout() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
         function loadReceipts() {
             const receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            const filter = document.getElementById('receiptSearch').value.toUpperCase().trim();
             const tbody = document.getElementById('receiptTableBody');
             tbody.innerHTML = '';
-            
-            receipts.forEach((r, idx) => {
+
+            const filteredReceipts = receipts.filter(r => {
+                const recNo = (r.receiptNo || '').toUpperCase();
+                const acNo = (r.accountNo || '').toUpperCase();
+                const name = (r.customerName || '').toUpperCase();
+                return recNo.includes(filter) || acNo.includes(filter) || name.includes(filter);
+            });
+
+            document.getElementById('totalCount').innerText = filteredReceipts.length;
+
+            if (filteredReceipts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 italic">No collection receipts found in registry!</td></tr>`;
+                return;
+            }
+
+            filteredReceipts.forEach((r, idx) => {
+                // Get absolute index from original array for edit/delete functions
+                const realIndex = receipts.indexOf(r);
+
                 let row = `
-                <tr>
-                    <td class="p-3">${r.date}</td>
-                    <td class="p-3 font-mono text-purple-400">${r.receiptNo}</td>
-                    <td class="p-3 font-mono">${r.accountNo}</td>
-                    <td class="p-3">${r.customerName}</td>
-                    <td class="p-3">${r.paymentMode}</td>
-                    <td class="p-3 font-bold text-emerald-400">₹${parseFloat(r.amount).toFixed(2)}</td>
-                    <td class="p-3 flex justify-center gap-2">
-                        <button onclick="viewReceipt(${idx})" class="p-1.5 bg-blue-600/30 text-blue-400 rounded"><i class="fa-solid fa-eye"></i> View</button>
-                        <button onclick="editDate(${idx})" class="p-1.5 bg-amber-600/30 text-amber-400 rounded"><i class="fa-solid fa-calendar"></i> Edit Date</button>
-                        <button onclick="reprintReceipt(${idx})" class="p-1.5 bg-purple-600/30 text-purple-400 rounded"><i class="fa-solid fa-print"></i> Duplicate Print</button>
-                        <button onclick="shareWhatsapp(${idx})" class="p-1.5 bg-emerald-600/30 text-emerald-400 rounded"><i class="fa-brands fa-whatsapp"></i></button>
-                        <button onclick="copyReceipt(${idx})" class="p-1.5 bg-slate-600/30 text-slate-300 rounded"><i class="fa-solid fa-copy"></i></button>
-                        <button onclick="deleteReceipt(${idx})" class="p-1.5 bg-rose-600/30 text-rose-400 rounded"><i class="fa-solid fa-trash"></i></button>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-3 text-slate-300">${r.date || '-'}</td>
+                    <td class="p-3 font-bold text-purple-400">${r.receiptNo || '-'}</td>
+                    <td class="p-3 text-slate-200">${r.accountNo || '-'}</td>
+                    <td class="p-3 text-white font-sans font-medium">${r.customerName || 'Unknown'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-sans">${r.paymentMode || 'Cash'}</span></td>
+                    <td class="p-3 font-bold text-emerald-400">₹${parseFloat(r.amount || 0).toFixed(2)}</td>
+                    <td class="p-3 text-slate-400 font-sans text-[11px]">${r.madeBy || 'Staff'}</td>
+                    <td class="p-3 flex justify-center gap-1.5">
+                        <button title="View" onclick="viewReceipt(${realIndex})" class="p-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg transition-all"><i class="fa-solid fa-eye"></i></button>
+                        <button title="Edit Date" onclick="editDate(${realIndex})" class="p-1.5 bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 rounded-lg transition-all"><i class="fa-solid fa-calendar-days"></i></button>
+                        <button title="Duplicate Print" onclick="reprintReceipt(${realIndex})" class="p-1.5 bg-purple-600/20 hover:bg-purple-600/40 text-purple-400 rounded-lg transition-all"><i class="fa-solid fa-print"></i></button>
+                        <button title="Share WhatsApp" onclick="shareWhatsapp(${realIndex})" class="p-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg transition-all"><i class="fa-brands fa-whatsapp"></i></button>
+                        <button title="Copy String" onclick="copyReceipt(${realIndex})" class="p-1.5 bg-slate-600/20 hover:bg-slate-600/40 text-slate-300 rounded-lg transition-all"><i class="fa-solid fa-copy"></i></button>
+                        <button title="Delete Receipt" onclick="deleteReceipt(${realIndex})" class="p-1.5 bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 rounded-lg transition-all"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>`;
                 tbody.innerHTML += row;
@@ -73,62 +166,111 @@
         }
 
         function viewReceipt(i) {
-            const r = JSON.parse(localStorage.getItem('vp_receipts'))[i];
-            document.getElementById('watermark').innerText = "VIEW ONLY";
+            const receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            const r = receipts[i];
+            if(!r) return;
+
+            document.getElementById('watermark').innerText = "ORIGINAL RECEIPT";
             document.getElementById('modalContent').innerHTML = `
-                <p><b>Receipt No:</b> ${r.receiptNo}</p><p><b>Date:</b> ${r.date}</p>
-                <p><b>Customer:</b> ${r.customerName} (${r.accountNo})</p>
-                <p><b>Amount Paid:</b> ₹${r.amount}</p><p><b>Mode:</b> ${r.paymentMode}</p>
-                <p><b>Bank / Ref:</b> ${r.bankName} - ${r.refNo}</p>
+                <div class="grid grid-cols-2 gap-2 border-b pb-2">
+                    <div><span class="text-slate-400 block text-[9px] uppercase">Receipt No</span><span class="font-mono font-bold text-purple-700">${r.receiptNo}</span></div>
+                    <div class="text-right"><span class="text-slate-400 block text-[9px] uppercase">Date</span><span class="font-mono font-semibold">${r.date}</span></div>
+                </div>
+                <div class="space-y-1">
+                    <p><span class="text-slate-500">Customer:</span> <b>${r.customerName}</b></p>
+                    <p><span class="text-slate-500">Account No:</span> <span class="font-mono font-bold">${r.accountNo}</span></p>
+                    <p><span class="text-slate-500">Amount Paid:</span> <span class="text-emerald-700 font-mono font-bold text-sm">₹${parseFloat(r.amount).toFixed(2)}</span></p>
+                    <p><span class="text-slate-500">Payment Mode:</span> <b>${r.paymentMode}</b></p>
+                    <p><span class="text-slate-500">Ref / Bank Details:</span> ${r.bankName || 'N/A'} ${r.refNo ? '(' + r.refNo + ')' : ''}</p>
+                    <p><span class="text-slate-500">Collected By:</span> ${r.madeBy || 'Staff'}</p>
+                </div>
             `;
             document.getElementById('viewModal').classList.remove('hidden');
         }
 
         function reprintReceipt(i) {
-            const r = JSON.parse(localStorage.getItem('vp_receipts'))[i];
+            const receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            const r = receipts[i];
+            if(!r) return;
+
             document.getElementById('watermark').innerText = "DUPLICATE";
             document.getElementById('modalContent').innerHTML = `
-                <p class="text-center font-bold text-red-600">*** DUPLICATE RECEIPT ***</p>
-                <p><b>Receipt No:</b> ${r.receiptNo}</p><p><b>Date:</b> ${r.date}</p>
-                <p><b>Customer:</b> ${r.customerName} (${r.accountNo})</p>
-                <p><b>Amount Paid:</b> ₹${r.amount}</p><p><b>Mode:</b> ${r.paymentMode}</p>
+                <div class="bg-rose-50 border border-rose-200 text-rose-700 text-center font-bold py-1 px-2 rounded mb-2 text-[10px] uppercase">
+                    *** DUPLICATE COPY ***
+                </div>
+                <div class="grid grid-cols-2 gap-2 border-b pb-2">
+                    <div><span class="text-slate-400 block text-[9px] uppercase">Receipt No</span><span class="font-mono font-bold text-purple-700">${r.receiptNo}</span></div>
+                    <div class="text-right"><span class="text-slate-400 block text-[9px] uppercase">Date</span><span class="font-mono font-semibold">${r.date}</span></div>
+                </div>
+                <div class="space-y-1 mt-2">
+                    <p><span class="text-slate-500">Customer:</span> <b>${r.customerName}</b></p>
+                    <p><span class="text-slate-500">Account No:</span> <span class="font-mono font-bold">${r.accountNo}</span></p>
+                    <p><span class="text-slate-500">Amount Paid:</span> <span class="text-emerald-700 font-mono font-bold text-sm">₹${parseFloat(r.amount).toFixed(2)}</span></p>
+                    <p><span class="text-slate-500">Mode:</span> <b>${r.paymentMode}</b></p>
+                </div>
             `;
             document.getElementById('viewModal').classList.remove('hidden');
         }
 
         function editDate(i) {
-            let receipts = JSON.parse(localStorage.getItem('vp_receipts'));
-            let newDate = prompt("Enter new date (YYYY-MM-DD):", receipts[i].date);
-            if (newDate) {
-                receipts[i].date = newDate;
+            let receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            let currentReceipt = receipts[i];
+            if(!currentReceipt) return;
+
+            let newDate = prompt("Enter new Date for Receipt (Format: YYYY-MM-DD):", currentReceipt.date);
+            
+            if (newDate && newDate.trim() !== '') {
+                receipts[i].date = newDate.trim();
                 localStorage.setItem('vp_receipts', JSON.stringify(receipts));
+                
+                // Alert Passbook Auto Update
+                alert(`✅ Date updated successfully to ${newDate}!\nThis change will automatically reflect in Passbook Terminal.`);
                 loadReceipts();
             }
         }
 
         function shareWhatsapp(i) {
-            const r = JSON.parse(localStorage.getItem('vp_receipts'))[i];
-            let text = `VP Microfinance EMI Receipt\nReceipt: ${r.receiptNo}\nCustomer: ${r.customerName}\nAmount: ₹${r.amount}\nDate: ${r.date}`;
+            const receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            const r = receipts[i];
+            if(!r) return;
+
+            let text = `*VP MICROFINANCE COLLECTION RECEIPT*\n` +
+                       `----------------------------------\n` +
+                       `Receipt No: ${r.receiptNo}\n` +
+                       `Date: ${r.date}\n` +
+                       `Customer: ${r.customerName}\n` +
+                       `Account No: ${r.accountNo}\n` +
+                       `Amount Received: ₹${parseFloat(r.amount).toFixed(2)}\n` +
+                       `Mode: ${r.paymentMode}\n` +
+                       `----------------------------------\n` +
+                       `Thank you for your payment!`;
+            
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function copyReceipt(i) {
-            const r = JSON.parse(localStorage.getItem('vp_receipts'))[i];
-            let text = `Receipt: ${r.receiptNo} | Cust: ${r.customerName} | Amt: ₹${r.amount} | Date: ${r.date}`;
+            const receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            const r = receipts[i];
+            if(!r) return;
+
+            let text = `Receipt: ${r.receiptNo} | Cust: ${r.customerName} (${r.accountNo}) | Amt: ₹${r.amount} | Date: ${r.date}`;
             navigator.clipboard.writeText(text);
-            alert("Receipt details copied to clipboard!");
+            alert("✅ Receipt Summary Copied to Clipboard!");
         }
 
         function deleteReceipt(i) {
-            if (confirm("Are you sure you want to delete this receipt?")) {
-                let receipts = JSON.parse(localStorage.getItem('vp_receipts'));
+            if (confirm("⚠️ Are you sure you want to delete this receipt?\nDeleting this entry will adjust the customer's pending balance in the Passbook.")) {
+                let receipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
                 receipts.splice(i, 1);
                 localStorage.setItem('vp_receipts', JSON.stringify(receipts));
                 loadReceipts();
             }
         }
 
-        function closeModal() { document.getElementById('viewModal').classList.add('hidden'); }
+        function closeModal() { 
+            document.getElementById('viewModal').classList.add('hidden'); 
+        }
+
         window.onload = loadReceipts;
     </script>
 </body>
