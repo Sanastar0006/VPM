@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Book | VP MICROFINANCE 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #0b0f19; color: #e2e8f0; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+        <div class="flex justify-between items-center glass-card p-4 rounded-2xl">
+            <h1 class="text-xl font-bold text-blue-400"><i class="fa-solid fa-building-columns"></i> Bank Book Terminal Registry</h1>
+            <button onclick="generatePDF()" class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-pdf"></i> Export Bank PDF</button>
+        </div>
+
+        <div id="pdfContent" class="space-y-6 p-4 bg-[#0b0f19]">
+            <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-white/5 text-blue-300 uppercase font-mono">
+                        <tr>
+                            <th class="p-3">Date</th>
+                            <th class="p-3">Voucher No</th>
+                            <th class="p-3">Particulars</th>
+                            <th class="p-3">Mode / Bank</th>
+                            <th class="p-3">Made By</th>
+                            <th class="p-3">Amount (₹)</th>
+                            <th class="p-3 no-pdf text-center">Functions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bankTableBody" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+
+            <!-- Totals -->
+            <div class="grid grid-cols-3 gap-4 font-mono text-xs">
+                <div class="glass-card p-4 rounded-xl">Total Credit: <span id="totalCredit" class="text-emerald-400 font-bold">₹0.00</span></div>
+                <div class="glass-card p-4 rounded-xl">Total Debit: <span id="totalDebit" class="text-red-400 font-bold">₹0.00</span></div>
+                <div class="glass-card p-4 rounded-xl">Closing Bank Balance: <span id="closingBalance" class="text-blue-400 font-bold">₹0.00</span></div>
+            </div>
+
+            <!-- Signature Lines -->
+            <div class="flex justify-between pt-12 text-xs font-mono border-t border-white/10">
+                <div>___________________<br>Accountant Sign</div>
+                <div>___________________<br>Manager Sign</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadBankBook() {
+            const bankData = JSON.parse(localStorage.getItem('vp_bank_book')) || [];
+            const tbody = document.getElementById('bankTableBody');
+            tbody.innerHTML = '';
+            let credit = 0, debit = 0;
+
+            bankData.forEach((b, idx) => {
+                if(b.type === 'CREDIT') credit += parseFloat(b.amount);
+                else debit += parseFloat(b.amount);
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-mono">${b.date}</td>
+                        <td class="p-3 font-mono text-blue-400">${b.voucherNo}</td>
+                        <td class="p-3">${b.particulars}</td>
+                        <td class="p-3">${b.paymentMode} (${b.bankName || 'N/A'})</td>
+                        <td class="p-3">${b.madeBy}</td>
+                        <td class="p-3 font-mono text-emerald-400">₹${parseFloat(b.amount).toFixed(2)}</td>
+                        <td class="p-3 no-pdf text-center">
+                            <button onclick="deleteBankEntry(${idx})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('totalCredit').innerText = `₹${credit.toFixed(2)}`;
+            document.getElementById('totalDebit').innerText = `₹${debit.toFixed(2)}`;
+            document.getElementById('closingBalance').innerText = `₹${(credit - debit).toFixed(2)}`;
+        }
+
+        function deleteBankEntry(idx) {
+            let bankData = JSON.parse(localStorage.getItem('vp_bank_book')) || [];
+            bankData.splice(idx, 1);
+            localStorage.setItem('vp_bank_book', JSON.stringify(bankData));
+            loadBankBook();
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('pdfContent');
+            html2pdf().from(element).save('Bank_Book_Report.pdf');
+        }
+
+        window.onload = loadBankBook;
+    </script>
+</body>
+</html>
