@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Passbook | VP MICROFINANCE PRO 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #060814; color: #e2e8f0; }
+        .yono-gradient { background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .custom-dropdown::-webkit-scrollbar { width: 4px; }
+        .custom-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen bg-[#060814] text-slate-100 flex">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 glass-card fixed inset-y-0 left-0 z-50 p-4 m-3 rounded-2xl h-[calc(100vh-24px)] transition-transform duration-300 lg:translate-x-0 -translate-x-full lg:static">
+        <div class="flex items-center gap-3 px-2 py-4 border-b border-white/5 mb-6">
+            <div class="w-8 h-8 rounded-lg yono-gradient flex items-center justify-center text-white font-bold text-sm shadow-md">VP</div>
+            <div>
+                <h1 class="text-xs font-bold tracking-wider text-white uppercase">VP Microfinance</h1>
+                <p class="text-[10px] text-purple-400 font-medium tracking-wide">Pro 2026 Registry</p>
+            </div>
+        </div>
+
+        <nav class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-chart-pie"></i> Dashboard Matrix</a>
+            <a href="customer-add.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-user-plus"></i> Capital Disbursement</a>
+            <a href="customer-list.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-address-book"></i> Customer Ledger</a>
+            <a href="passbook.html" class="flex items-center gap-3 px-3 py-2.5 text-white yono-gradient rounded-xl text-xs font-medium shadow-lg"><i class="fa-solid fa-book-open"></i> Customer Passbook</a>
+            <a href="transaction.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-money-bill-transfer"></i> Entry Terminal</a>
+            <a href="receipt.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-receipt"></i> Receipts Hub</a>
+            <a href="cash-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-wallet"></i> Cash Book</a>
+            <a href="bank-book.html" class="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white rounded-xl text-xs font-medium"><i class="fa-solid fa-building-columns"></i> Bank Book</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 lg:pl-6 p-6 overflow-x-hidden">
+        <header class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebarLayout()" class="lg:hidden p-2 text-slate-400 hover:text-white glass-card rounded-xl text-xs"><i class="fa-solid fa-bars"></i></button>
+                <div>
+                    <h2 class="text-base font-semibold text-white tracking-wide">Customer Passbook Terminal</h2>
+                    <p class="text-xs text-slate-400">Individual Customer Repayment Ledger & EMI Schedule Matrix</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="w-full max-w-2xl mx-auto mb-6 relative">
+            <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Search Customer Account</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="passbookSearch" autocomplete="off" oninput="triggerSearchPipeline()" onfocus="triggerSearchPipeline()" placeholder="Search by Account No, Phone No, or PAN No..." class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white text-xs">
+            </div>
+            <div id="passbookSearchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-56 overflow-y-auto custom-dropdown"></div>
+        </div>
+
+        <!-- Customer Summary Header Card -->
+        <div id="customerDetailCard" class="hidden w-full max-w-5xl glass-card rounded-2xl p-6 mb-6 mx-auto border border-white/10 space-y-4">
+            <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-3 gap-2">
+                <div>
+                    <h3 id="cName" class="text-lg font-bold text-white tracking-wide">Customer Name</h3>
+                    <p class="text-xs text-slate-400">Account No: <span id="cAcNo" class="font-mono text-purple-400 font-bold">VP-0000</span></p>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Live Outstanding Amount</span>
+                    <span id="cOutstanding" class="text-xl font-bold font-mono text-rose-400">₹0.00</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div>
+                    <span class="text-[10px] text-slate-500 uppercase block">Loan Disbursed</span>
+                    <span id="cLoanAmt" class="font-bold font-mono text-emerald-400">₹0.00</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-slate-500 uppercase block">Phone Number</span>
+                    <span id="cPhone" class="font-semibold text-slate-200">-</span>
+                </div>
+                <div class="col-span-2">
+                    <span class="text-[10px] text-slate-500 uppercase block">Address</span>
+                    <span id="cAddress" class="text-slate-300">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule & Repayment Table -->
+        <div id="passbookTableCard" class="hidden w-full max-w-5xl glass-card rounded-2xl p-4 mx-auto overflow-x-auto border border-white/5">
+            <h4 class="text-xs font-bold uppercase text-purple-400 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-list-check"></i> Repayment Schedule Ledger
+            </h4>
+            <table class="w-full text-left text-xs">
+                <thead class="text-slate-400 border-b border-white/10 uppercase text-[10px]">
+                    <tr>
+                        <th class="p-2.5">Due Date</th>
+                        <th class="p-2.5">Paid Date</th>
+                        <th class="p-2.5">Receipt No</th>
+                        <th class="p-2.5">Principal</th>
+                        <th class="p-2.5">Interest</th>
+                        <th class="p-2.5">Due Amount</th>
+                        <th class="p-2.5">Paid Amount</th>
+                        <th class="p-2.5">Pending</th>
+                        <th class="p-2.5">Status</th>
+                        <th class="p-2.5 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="passbookTableBody" class="divide-y divide-white/5 font-mono"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebarLayout() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function triggerSearchPipeline() {
+            const query = document.getElementById('passbookSearch').value.toUpperCase().trim();
+            const dropdown = document.getElementById('passbookSearchDropdown');
+            const customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+
+            if (customers.length === 0) {
+                dropdown.innerHTML = `<div class="p-3 text-slate-500 text-xs italic">No customers registered in database!</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            const matches = customers.filter(c => {
+                const acNo = (c.accountNo || c.accountNumber || '').toUpperCase();
+                const phone = (c.phone || c.mobile || c.phoneNumber || '').toUpperCase();
+                const pan = (c.panNo || c.pan || '').toUpperCase();
+                const name = (c.customerName || c.name || '').toUpperCase();
+
+                return query === '' || acNo.includes(query) || phone.includes(query) || pan.includes(query) || name.includes(query);
+            });
+
+            dropdown.innerHTML = '';
+            if (matches.length === 0) {
+                dropdown.innerHTML = `<div class="p-3 text-slate-500 text-xs italic">No matching record found!</div>`;
+            } else {
+                matches.forEach(c => {
+                    const row = document.createElement('div');
+                    row.className = 'p-2.5 hover:bg-purple-600/20 text-xs cursor-pointer flex justify-between items-center border-b border-white/5';
+                    row.innerHTML = `
+                        <div>
+                            <span class="font-bold text-white block">${c.customerName || c.name || 'Unknown'}</span>
+                            <span class="text-[10px] text-slate-400">Phone: ${c.phone || c.mobile || '-'}</span>
+                        </div>
+                        <span class="font-mono text-purple-400 text-xs font-bold">${c.accountNo || c.accountNumber || 'VP-N/A'}</span>
+                    `;
+                    row.onclick = () => selectPassbookCustomer(c);
+                    dropdown.appendChild(row);
+                });
+            }
+            dropdown.classList.remove('hidden');
+        }
+
+        function selectPassbookCustomer(cust) {
+            document.getElementById('passbookSearchDropdown').classList.add('hidden');
+            const acNo = cust.accountNo || cust.accountNumber;
+            document.getElementById('passbookSearch').value = acNo;
+
+            // Header Details Populate
+            document.getElementById('cName').innerText = cust.customerName || cust.name || 'N/A';
+            document.getElementById('cAcNo').innerText = acNo;
+            document.getElementById('cLoanAmt').innerText = `₹${parseFloat(cust.loanAmount || cust.amount || 0).toFixed(2)}`;
+            document.getElementById('cPhone').innerText = cust.phone || cust.mobile || '-';
+            document.getElementById('cAddress').innerText = cust.address || '-';
+
+            renderCustomerLedgerTable(cust);
+            
+            document.getElementById('customerDetailCard').classList.remove('hidden');
+            document.getElementById('passbookTableCard').classList.remove('hidden');
+        }
+
+        function renderCustomerLedgerTable(cust) {
+            const tbody = document.getElementById('passbookTableBody');
+            tbody.innerHTML = '';
+
+            const acNo = cust.accountNo || cust.accountNumber;
+            const allReceipts = JSON.parse(localStorage.getItem('vp_receipts')) || [];
+            
+            // Filter all transaction receipts for this customer
+            const custReceipts = allReceipts.filter(r => r.accountNo === acNo);
+
+            const tenure = parseInt(cust.tenure || cust.tenureMonths || 12);
+            const loanAmount = parseFloat(cust.loanAmount || cust.amount || 0);
+            const emiVal = parseFloat(cust.emi || cust.emiAmount || (loanAmount / tenure));
+            
+            // Interest calculations
+            const interestRate = parseFloat(cust.interestRate || 12) / 100 / 12;
+            const monthlyInterest = loanAmount * interestRate;
+            const monthlyPrincipal = emiVal - monthlyInterest;
+
+            let startDate = cust.disbursementDate ? new Date(cust.disbursementDate) : new Date();
+
+            let totalPaidSoFar = custReceipts.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+            let totalLoanValuation = emiVal * tenure;
+            let currentOutstanding = totalLoanValuation - totalPaidSoFar;
+            if(currentOutstanding < 0) currentOutstanding = 0;
+
+            document.getElementById('cOutstanding').innerText = `₹${currentOutstanding.toFixed(2)}`;
+
+            let runningPaidPool = totalPaidSoFar;
+
+            for (let i = 1; i <= tenure; i++) {
+                let dueDate = new Date(startDate);
+                dueDate.setMonth(dueDate.getMonth() + i);
+                let dueDateStr = dueDate.toISOString().split('T')[0];
+
+                let receiptObj = custReceipts[i - 1] || null;
+                let paidDateStr = receiptObj ? receiptObj.date : '-';
+                let receiptNoStr = receiptObj ? receiptObj.receiptNo : '-';
+
+                let rowPaidAmt = 0;
+                let rowStatus = "";
+                let rowStatusBadge = "";
+                let pendingAmt = 0;
+
+                if (runningPaidPool >= emiVal) {
+                    rowPaidAmt = emiVal;
+                    runningPaidPool -= emiVal;
+
+                    if (receiptObj) {
+                        rowStatus = "Paid";
+                        rowStatusBadge = `<span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">Paid</span>`;
+                    } else {
+                        rowStatus = "Advance";
+                        rowStatusBadge = `<span class="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-400 font-bold text-[10px]">Advance</span>`;
+                    }
+                    pendingAmt = 0;
+                } else if (runningPaidPool > 0) {
+                    rowPaidAmt = runningPaidPool;
+                    pendingAmt = emiVal - rowPaidAmt;
+                    runningPaidPool = 0;
+
+                    rowStatus = "Part Paid";
+                    rowStatusBadge = `<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 font-bold text-[10px]">Part Paid</span>`;
+                } else {
+                    rowPaidAmt = 0;
+                    pendingAmt = emiVal;
+
+                    rowStatus = "Pending";
+                    rowStatusBadge = `<span class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 font-bold text-[10px]">Pending</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="p-2.5 text-slate-300">${dueDateStr}</td>
+                        <td class="p-2.5 text-slate-400">${paidDateStr}</td>
+                        <td class="p-2.5 text-purple-400">${receiptNoStr}</td>
+                        <td class="p-2.5 text-slate-300">₹${(monthlyPrincipal > 0 ? monthlyPrincipal : emiVal*0.8).toFixed(2)}</td>
+                        <td class="p-2.5 text-slate-300">₹${(monthlyInterest > 0 ? monthlyInterest : emiVal*0.2).toFixed(2)}</td>
+                        <td class="p-2.5 font-bold text-white">₹${emiVal.toFixed(2)}</td>
+                        <td class="p-2.5 text-emerald-400 font-bold">₹${rowPaidAmt.toFixed(2)}</td>
+                        <td class="p-2.5 text-rose-400 font-bold">₹${pendingAmt.toFixed(2)}</td>
+                        <td class="p-2.5">${rowStatusBadge}</td>
+                        <td class="p-2.5 text-center">
+                            ${rowStatus !== 'Paid' ? `
+                                <button onclick="redirectToPay('${acNo}')" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg text-[10px] transition-all flex items-center gap-1 mx-auto">
+                                    <i class="fa-solid fa-credit-card"></i> Pay
+                                </button>
+                            ` : '<i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>'}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function redirectToPay(acNo) {
+            window.location.href = `transaction.html?account=${acNo}`;
+        }
+    </script>
+</body>
+</html>
