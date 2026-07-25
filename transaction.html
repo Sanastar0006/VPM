@@ -86,10 +86,10 @@
                 <!-- SECTION 1: CUSTOMER RECEIPT MODULE -->
                 <div id="customerReceiptSection" class="space-y-4">
                     <div class="relative">
-                        <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Search Account Number</label>
+                        <label class="block text-[10px] text-purple-400 font-semibold mb-1 uppercase tracking-wider">Search Account Number / Customer</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
-                            <input type="text" id="searchAccount" autocomplete="off" onfocus="triggerAccountSearchPipeline()" oninput="triggerAccountSearchPipeline()" placeholder="Search active loans (e.g., VP-102...)" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs">
+                            <input type="text" id="searchAccount" autocomplete="off" onfocus="triggerAccountSearchPipeline()" oninput="triggerAccountSearchPipeline()" placeholder="Click or type to search (e.g., VP-102 or Name...)" class="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-slate-700/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-purple-500">
                         </div>
                         <div id="searchDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-[#0f1524] border border-white/10 rounded-xl shadow-2xl hidden max-h-48 overflow-y-auto custom-dropdown"></div>
                     </div>
@@ -97,11 +97,11 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] text-slate-400 mb-1 uppercase">Customer Legal Name</label>
-                            <input type="text" id="customerName" readonly placeholder="Auto-populated Name" class="w-full px-3 py-2 bg-white/[0.02] border border-white/5 rounded-xl text-slate-400 text-xs">
+                            <input type="text" id="customerName" readonly placeholder="Auto-populated Name" class="w-full px-3 py-2 bg-white/[0.02] border border-white/5 rounded-xl text-slate-400 text-xs focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] text-slate-400 mb-1 uppercase">Target EMI Valuation</label>
-                            <input type="text" id="emiAmount" readonly placeholder="0.00" class="w-full px-3 py-2 bg-white/[0.02] border border-white/5 rounded-xl text-emerald-400 font-mono font-bold text-xs">
+                            <input type="text" id="emiAmount" readonly placeholder="0.00" class="w-full px-3 py-2 bg-white/[0.02] border border-white/5 rounded-xl text-emerald-400 font-mono font-bold text-xs focus:outline-none">
                         </div>
                     </div>
                 </div>
@@ -197,6 +197,8 @@
     </main>
 
     <script>
+        let selectedCustomerObj = null;
+
         document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
 
         function toggleSidebarLayout() {
@@ -217,7 +219,7 @@
             }
         }
 
-        // Ledger Head options based on Microfinance operations
+        // Microfinance Ledger Head Options
         const ledgerOptions = {
             Income: [
                 "Interbranch Income", "FD Amount Deposit", "Cash In Bank", "Loan Processing Fee", 
@@ -265,52 +267,103 @@
             else if(bank.includes('Canara')) ifsc.value = 'CNRB0003344';
         }
 
+        // Consolidated LocalStorage Fetcher (Avoids Data-Loss across multiple keys)
+        function fetchAllCustomersFromStorage() {
+            const local1 = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+            const local2 = JSON.parse(localStorage.getItem('vp_customers')) || [];
+            
+            const combinedMap = new Map();
+            [...local1, ...local2].forEach(item => {
+                const keyAc = (item.accountNo || item.accNo || item.accountNumber || '').toString().trim();
+                if (keyAc && !combinedMap.has(keyAc)) {
+                    combinedMap.set(keyAc, item);
+                }
+            });
+            return Array.from(combinedMap.values());
+        }
+
+        // Dynamic Account Search Pipeline with Flexible Status Checking
         function triggerAccountSearchPipeline() {
             const inputVal = document.getElementById('searchAccount').value.toUpperCase().trim();
             const dropdown = document.getElementById('searchDropdown');
-            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-            
-            let approvedCustomers = customers.filter(c => {
-                let statusVal = (c.status || c.approvalStatus || c.loanStatus || '').toUpperCase();
-                return statusVal === 'LOAN APPROVED';
-            });
+            const allCustomers = fetchAllCustomersFromStorage();
 
-            if (approvedCustomers.length === 0) {
-                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No active approved customers found!</div>`;
+            if (allCustomers.length === 0) {
+                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">No stored customers found in system!</div>`;
                 dropdown.classList.remove('hidden');
                 return;
             }
 
-            let filtered = approvedCustomers.filter(c => {
-                let currentAcNo = (c.accountNo || c.accountNumber || '').toUpperCase();
-                return inputVal === '' || currentAcNo.includes(inputVal);
+            // Flexible filter: checks status if present, otherwise returns all available accounts
+            let approvedCustomers = allCustomers.filter(c => {
+                let statusVal = (c.status || c.approvalStatus || c.loanStatus || '').toString().toUpperCase();
+                return statusVal === '' || statusVal.includes('APPROVED') || statusVal.includes('ACTIVE');
             });
+
+            let filtered = approvedCustomers.filter(c => {
+                let currentAcNo = (c.accountNo || c.accNo || c.accountNumber || '').toString().toUpperCase();
+                let currentName = (c.customerName || c.name || '').toString().toUpperCase();
+                return inputVal === '' || currentAcNo.includes(inputVal) || currentName.includes(inputVal);
+            });
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<div class="px-4 py-3 text-slate-500 text-xs italic">Machi, no active accounts match search!</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
 
             dropdown.innerHTML = '';
             filtered.forEach(account => {
-                let correctAcNo = account.accountNo || account.accountNumber || 'VP-N/A';
+                let correctAcNo = account.accountNo || account.accNo || account.accountNumber || 'VP-N/A';
                 let correctName = account.customerName || account.name || 'Unknown';
+                let correctEmi = account.emi || account.emiAmount || 0;
+
                 const searchRow = document.createElement('div');
-                searchRow.className = "px-4 py-2 hover:bg-purple-600/20 text-xs cursor-pointer flex justify-between";
-                searchRow.innerHTML = `<span class="font-mono text-purple-400 font-bold">${correctAcNo}</span><span>${correctName}</span>`;
+                searchRow.className = "px-4 py-2 hover:bg-purple-600/20 text-xs cursor-pointer flex justify-between items-center transition-all";
+                searchRow.innerHTML = `
+                    <div>
+                        <span class="font-mono text-purple-400 font-bold mr-2">${correctAcNo}</span>
+                        <span class="text-slate-200">${correctName}</span>
+                    </div>
+                    <span class="text-emerald-400 font-mono text-[11px]">₹${parseFloat(correctEmi).toFixed(2)}</span>
+                `;
                 searchRow.onclick = () => selectAccount(account);
                 dropdown.appendChild(searchRow);
             });
+
             dropdown.classList.remove('hidden');
         }
 
         function selectAccount(cust) {
-            document.getElementById('searchAccount').value = cust.accountNo || cust.accountNumber;
-            document.getElementById('customerName').value = cust.customerName || cust.name;
-            document.getElementById('emiAmount').value = cust.emi || cust.emiAmount || 0;
-            document.getElementById('collectedAmount').value = cust.emi || cust.emiAmount || '';
+            selectedCustomerObj = cust;
+            const correctAcNo = cust.accountNo || cust.accNo || cust.accountNumber || 'VP-N/A';
+            const correctName = cust.customerName || cust.name || 'N/A';
+            const correctEmi = cust.emi || cust.emiAmount || 0;
+
+            document.getElementById('searchAccount').value = correctAcNo;
+            document.getElementById('customerName').value = correctName;
+            document.getElementById('emiAmount').value = parseFloat(correctEmi).toFixed(2);
+            document.getElementById('collectedAmount').value = parseFloat(correctEmi) || '';
             document.getElementById('searchDropdown').classList.add('hidden');
         }
 
+        // Close search dropdown on clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('searchDropdown');
+            const searchInput = document.getElementById('searchAccount');
+            if (e.target !== dropdown && e.target !== searchInput) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
         function clearTerminal() {
+            selectedCustomerObj = null;
             document.getElementById('transactionForm').reset();
             document.getElementById('nonCashContainer').classList.add('hidden');
             document.getElementById('searchDropdown').classList.add('hidden');
+            document.getElementById('customerName').value = '';
+            document.getElementById('emiAmount').value = '';
+            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
         }
 
         function executeTransactionCommit(e) {
@@ -323,10 +376,10 @@
             const voucherNo = 'VOU-' + Math.floor(100000 + Math.random() * 900000);
             const receiptNo = 'REC-' + Math.floor(100000 + Math.random() * 900000);
 
-            let bankName = paymentMode === 'Cash' ? 'N/A' : document.getElementById('bankName').value;
-            let ifsc = paymentMode === 'Cash' ? 'N/A' : document.getElementById('ifscCode').value;
-            let branch = paymentMode === 'Cash' ? 'N/A' : document.getElementById('branchName').value;
-            let refNo = paymentMode === 'Cash' ? 'N/A (Cash)' : document.getElementById('referenceNo').value;
+            let bankName = paymentMode === 'Cash' ? 'N/A' : (document.getElementById('bankName').value || 'N/A');
+            let ifsc = paymentMode === 'Cash' ? 'N/A' : (document.getElementById('ifscCode').value || 'N/A');
+            let branch = paymentMode === 'Cash' ? 'N/A' : (document.getElementById('branchName').value || 'N/A');
+            let refNo = paymentMode === 'Cash' ? 'N/A (Cash)' : (document.getElementById('referenceNo').value || 'N/A');
 
             let particularDetails = "";
             let custAcNo = "N/A";
@@ -335,6 +388,12 @@
             if (mode === 'CUSTOMER_RECEIPT') {
                 custAcNo = document.getElementById('searchAccount').value;
                 custName = document.getElementById('customerName').value;
+
+                if(!custAcNo || !custName) {
+                    alert("⚠️ Select a valid account number from the search list!");
+                    return;
+                }
+
                 particularDetails = `EMI Receipt - ${custName} (${custAcNo})`;
 
                 // Save to Receipts Registry
@@ -344,6 +403,18 @@
                     paymentMode, amount, madeBy, bankName, ifsc, branch, refNo
                 });
                 localStorage.setItem('vp_receipts', JSON.stringify(receipts));
+
+                // Deduct Outstanding balance in LocalStorage
+                ['vp_local_customers', 'vp_customers'].forEach(key => {
+                    let cList = JSON.parse(localStorage.getItem(key)) || [];
+                    let idx = cList.findIndex(x => (x.accountNo || x.accNo || x.accountNumber) === custAcNo);
+                    if (idx !== -1) {
+                        let currentBal = parseFloat(cList[idx].totalOutstanding || cList[idx].outstanding || 0);
+                        cList[idx].totalOutstanding = Math.max(0, currentBal - amount);
+                        localStorage.setItem(key, JSON.stringify(cList));
+                    }
+                });
+
             } else {
                 const head = document.getElementById('accountHead').value;
                 const ledger = document.getElementById('ledgerHead').value;
@@ -367,7 +438,7 @@
                 localStorage.setItem('vp_bank_book', JSON.stringify(bankBook));
             }
 
-            alert(`✅ Entry Executed Successfully!\nVoucher/Receipt: ${mode === 'CUSTOMER_RECEIPT' ? receiptNo : voucherNo}`);
+            alert(`✅ Entry Executed Successfully Machi!\nVoucher/Receipt: ${mode === 'CUSTOMER_RECEIPT' ? receiptNo : voucherNo}`);
             clearTerminal();
         }
     </script>
