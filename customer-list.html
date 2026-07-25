@@ -235,7 +235,7 @@
             return 'text-amber-400 border-amber-500/20';
         }
 
-        // 2. Status Select Handler (Redirects to transaction.html if LOAN APPROVED)
+        // 2. Status Select Handler (Only redirects IF LOAN APPROVED is selected)
         function handleStatusChange(accountNo, selectedStatus) {
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let targetIdx = customers.findIndex(c => c.accountNo === accountNo);
@@ -244,7 +244,7 @@
                 customers[targetIdx].status = selectedStatus;
                 localStorage.setItem('vp_local_customers', JSON.stringify(customers));
 
-                // Cloud Sync
+                // Background Cloud Sync
                 const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ 
                     action: 'updateStatus', 
                     accountNo: accountNo, 
@@ -252,102 +252,76 @@
                 }))}`;
                 fetch(syncEndpoint, { method: 'GET', mode: 'cors' }).catch(err => console.warn("Cloud sync bypass:", err));
 
-                // Condition logic: Redirect if LOAN APPROVED selected
+                // Strict Check: Only redirect if LOAN APPROVED
                 if (selectedStatus === 'LOAN APPROVED') {
                     alert(`✅ Status changed to LOAN APPROVED for ${accountNo}. Redirecting to Transaction Console...`);
                     window.location.href = `transaction.html?accountNo=${accountNo}`;
                 } else {
+                    // LOAN REJECTED or LOAN AMOUNT CHANGE keeps user on current page
                     renderActiveLedgerGrid();
                 }
             }
         }
 
-        // 3. Document View Lightbox Protocol
+        // 3. Document View Lightbox Handler
         function viewDoc(accountNo, docType) {
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let target = customers.find(c => c.accountNo === accountNo);
 
-            if (!target || !target[docType]) {
-                alert("⚠️ Document image not found for this account!");
-                return;
+            if (target && target[docType]) {
+                document.getElementById('previewImage').src = target[docType];
+                document.getElementById('imageModalTitle').innerText = `${docType === 'imgAadhar' ? 'Aadhar' : 'PAN'} Card Proof - ${accountNo}`;
+                document.getElementById('imageModal').classList.remove('hidden');
+            } else {
+                alert("⚠️ Document image not uploaded or unavailable for this customer!");
             }
-
-            document.getElementById('imageModalTitle').innerText = `${docType === 'imgAadhar' ? 'Aadhar Proof' : 'PAN Proof'} [ ${accountNo} ]`;
-            document.getElementById('previewImage').src = target[docType];
-            document.getElementById('imageModal').classList.remove('hidden');
         }
 
-        // 4. View & Edit Profile Procedures
-        function viewProfile(accountNo) {
-            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-            let target = customers.find(c => c.accountNo === accountNo);
-            if (!target) return;
-
-            document.getElementById('modalTitle').innerText = `View Account [ ${accountNo} ]`;
-            setFieldState(true);
-            populateModalData(target);
-            document.getElementById('modalSubmitBtn').classList.add('hidden');
-            document.getElementById('actionModal').classList.remove('hidden');
-        }
-
+        // 4. View / Edit Profile Modal Logic
         function editProfile(accountNo) {
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let target = customers.find(c => c.accountNo === accountNo);
             if (!target) return;
 
-            document.getElementById('modalTitle').innerText = `Modify Registry Data [ ${accountNo} ]`;
-            setFieldState(false);
-            populateModalData(target);
+            document.getElementById('modalAccountNo').value = target.accountNo || '';
+            document.getElementById('modalName').value = target.customerName || '';
+            document.getElementById('modalMobile').value = target.mobile || '';
+            document.getElementById('modalPrincipal').value = target.principal || 0;
+            document.getElementById('modalAddress').value = target.address || '';
+            document.getElementById('modalLandmark').value = target.landmark || '';
+            document.getElementById('modalEMI').value = target.emi || 0;
+            document.getElementById('modalStatus').value = target.status || 'LOAN APPROVED';
+
+            // Show Save Controls
+            document.getElementById('modalTitle').innerText = "Edit Customer Profile";
+            document.getElementById('modalForm').querySelectorAll('input, textarea, select').forEach(el => el.disabled = false);
+            document.getElementById('modalAccountNo').disabled = true; // Read-only account no
             document.getElementById('modalSubmitBtn').classList.remove('hidden');
+
             document.getElementById('actionModal').classList.remove('hidden');
         }
 
-        function deleteCustomerProfile(accountNo) {
-            if (!confirm(`⚠️ Machi, Warning!\nAre you sure you want to delete account: ${accountNo}?`)) return;
-
-            let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
-            let filteredCustomers = customers.filter(c => c.accountNo !== accountNo);
-            
-            localStorage.setItem('vp_local_customers', JSON.stringify(filteredCustomers));
-            renderActiveLedgerGrid();
-
-            const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ action: 'deleteCustomer', accountNo: accountNo }))}`;
-            fetch(syncEndpoint, { method: 'GET', mode: 'cors' }).catch(err => console.warn(err));
-            alert('🗑️ Account details removed successfully!');
-        }
-
-        function populateModalData(data) {
-            document.getElementById('modalAccountNo').value = data.accountNo || '';
-            document.getElementById('modalName').value = data.customerName || '';
-            document.getElementById('modalMobile').value = data.mobile || '';
-            document.getElementById('modalPrincipal').value = data.principal || 0;
-            document.getElementById('modalAddress').value = data.address || '';
-            document.getElementById('modalLandmark').value = data.landmark || '';
-            document.getElementById('modalEMI').value = data.emi || 0;
-            document.getElementById('modalStatus').value = data.status || 'LOAN APPROVED';
-        }
-
-        function setFieldState(isDisabled) {
-            document.getElementById('modalName').disabled = isDisabled;
-            document.getElementById('modalMobile').disabled = isDisabled;
-            document.getElementById('modalPrincipal').disabled = isDisabled;
-            document.getElementById('modalAddress').disabled = isDisabled;
-            document.getElementById('modalLandmark').disabled = isDisabled;
-            document.getElementById('modalEMI').disabled = isDisabled;
-            document.getElementById('modalStatus').disabled = isDisabled;
+        function viewProfile(accountNo) {
+            editProfile(accountNo);
+            // Convert modal into Read-Only View Mode
+            document.getElementById('modalTitle').innerText = "Customer Profile Details (View Only)";
+            document.getElementById('modalForm').querySelectorAll('input, textarea, select').forEach(el => el.disabled = true);
+            document.getElementById('modalSubmitBtn').classList.add('hidden');
         }
 
         function closeActionModal() {
             document.getElementById('actionModal').classList.add('hidden');
         }
 
+        // 5. Update Pipeline & Modal Save Action
         function saveUpdatedCustomerData(e) {
             e.preventDefault();
             let targetAc = document.getElementById('modalAccountNo').value;
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             let targetIdx = customers.findIndex(c => c.accountNo === targetAc);
-            if(targetIdx === -1) return;
+            if (targetIdx === -1) return;
 
+            // Update memory payload
             customers[targetIdx].customerName = document.getElementById('modalName').value;
             customers[targetIdx].mobile = document.getElementById('modalMobile').value;
             customers[targetIdx].principal = parseFloat(document.getElementById('modalPrincipal').value) || 0;
@@ -355,43 +329,60 @@
             customers[targetIdx].landmark = document.getElementById('modalLandmark').value;
             customers[targetIdx].emi = parseFloat(document.getElementById('modalEMI').value) || 0;
             
-            const newStatus = document.getElementById('modalStatus').value;
-            customers[targetIdx].status = newStatus;
+            const selectedStatus = document.getElementById('modalStatus').value;
+            customers[targetIdx].status = selectedStatus;
 
+            // Save to LocalStorage
             localStorage.setItem('vp_local_customers', JSON.stringify(customers));
-            renderActiveLedgerGrid();
-            closeActionModal();
+            
+            // Cloud Sync Handshake
+            const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ 
+                action: 'updateCustomer', 
+                data: customers[targetIdx] 
+            }))}`;
+            fetch(syncEndpoint, { method: 'GET', mode: 'cors' }).catch(err => console.warn("Cloud sync bypass:", err));
 
-            if (newStatus === 'LOAN APPROVED') {
+            closeActionModal();
+            renderActiveLedgerGrid();
+
+            // Strict Condition: Redirect ONLY on LOAN APPROVED
+            if (selectedStatus === 'LOAN APPROVED') {
                 window.location.href = `transaction.html?accountNo=${targetAc}`;
+            } else {
+                alert(`👍 Status updated to "${selectedStatus}" successfully!`);
             }
         }
 
-        // 5. Download Excel Protocol
+        // 6. Delete Profile Action
+        function deleteCustomerProfile(accountNo) {
+            if (confirm(`Are you sure you want to delete customer ${accountNo}?`)) {
+                let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
+                customers = customers.filter(c => c.accountNo !== accountNo);
+                localStorage.setItem('vp_local_customers', JSON.stringify(customers));
+
+                // Cloud Delete Handshake
+                const syncEndpoint = `${CLOUD_SYNC_URL}?jsonData=${encodeURIComponent(JSON.stringify({ 
+                    action: 'deleteCustomer', 
+                    accountNo: accountNo 
+                }))}`;
+                fetch(syncEndpoint, { method: 'GET', mode: 'cors' }).catch(err => console.warn("Cloud sync bypass:", err));
+
+                renderActiveLedgerGrid();
+            }
+        }
+
+        // 7. Excel Export Protocol
         function exportToExcel() {
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             if(customers.length === 0) { alert("No data to export!"); return; }
 
-            let exportData = customers.map(c => ({
-                "Account No": c.accountNo,
-                "Customer Name": c.customerName,
-                "Mobile": c.mobile,
-                "PAN No": c.panNo || '',
-                "Principal": c.principal,
-                "EMI": c.emi,
-                "Total Outstanding": c.totalOutstanding,
-                "Address": c.address || '',
-                "Landmark": c.landmark || '',
-                "Status": c.status || 'LOAN APPROVED'
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(exportData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Customer Ledger");
-            XLSX.writeFile(wb, "VP_Microfinance_Customer_Ledger.xlsx");
+            const worksheet = XLSX.utils.json_to_sheet(customers);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Customers");
+            XLSX.writeFile(workbook, "VP_Microfinance_Customer_Ledger.xlsx");
         }
 
-        // 6. Download PDF Protocol
+        // 8. Download PDF Protocol
         function exportToPDF() {
             let customers = JSON.parse(localStorage.getItem('vp_local_customers')) || [];
             if(customers.length === 0) { alert("No data to export!"); return; }
