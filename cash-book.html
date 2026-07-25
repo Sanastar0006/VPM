@@ -2,156 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cash Book | VP MICROFINANCE 2026</title>
+    <title>Cash Book & Audit | VP MICROFINANCE PRO 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #0b0f19; color: #e2e8f0; }
+        body { font-family: sans-serif; background: #0b0f19; color: #e2e8f0; }
         .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
     </style>
 </head>
 <body class="p-6">
-    <div class="max-w-6xl mx-auto space-y-6">
-        <div class="flex justify-between items-center glass-card p-4 rounded-2xl">
-            <h1 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-wallet"></i> Cash Book Terminal Registry</h1>
-            <button onclick="generatePDF()" class="px-4 py-2 bg-purple-600 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-pdf"></i> Export Cash PDF</button>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-wallet text-amber-500"></i> Cash Book & Daily Audit Hub</h2>
+        
+        <!-- Cash Book Table -->
+        <div class="glass-card rounded-2xl p-4 overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="text-slate-400 border-b border-white/10 uppercase">
+                    <tr>
+                        <th class="p-3">Date</th>
+                        <th class="p-3">Voucher No</th>
+                        <th class="p-3">Particulars</th>
+                        <th class="p-3">Made By</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="cashTableBody" class="divide-y divide-white/5"></tbody>
+            </table>
+            
+            <div class="mt-4 pt-4 border-t border-white/10 flex justify-between text-xs font-bold">
+                <div>Total Credit: <span id="totalCredit" class="text-emerald-400">₹0.00</span></div>
+                <div>Total Debit: <span id="totalDebit" class="text-rose-400">₹0.00</span></div>
+                <div>Closing Cash Balance: <span id="closingBalance" class="text-purple-400">₹0.00</span></div>
+            </div>
         </div>
 
-        <div id="pdfContent" class="space-y-6 p-4 bg-[#0b0f19]">
-            <div class="glass-card rounded-2xl p-4 overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-white/5 text-amber-300 uppercase font-mono">
-                        <tr>
-                            <th class="p-3">Date</th>
-                            <th class="p-3">Voucher No</th>
-                            <th class="p-3">Particulars</th>
-                            <th class="p-3">Mode</th>
-                            <th class="p-3">Made By</th>
-                            <th class="p-3">Amount (₹)</th>
-                            <th class="p-3 no-pdf text-center">Functions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cashTableBody" class="divide-y divide-white/5"></tbody>
-                </table>
+        <!-- Cash Denomination Module -->
+        <div class="glass-card rounded-2xl p-6 max-w-xl mx-auto space-y-4">
+            <h3 class="text-sm font-bold text-amber-400 border-b border-white/10 pb-2">Physical Cash Denomination Counter</h3>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="flex items-center justify-between"><label>₹500 x</label><input type="number" id="d500" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹200 x</label><input type="number" id="d200" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹100 x</label><input type="number" id="d100" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹50 x</label><input type="number" id="d50" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹20 x</label><input type="number" id="d20" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹10 x</label><input type="number" id="d10" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹5 x</label><input type="number" id="d5" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹2 x</label><input type="number" id="d2" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+                <div class="flex items-center justify-between"><label>₹1 x</label><input type="number" id="d1" oninput="calculateDenomination()" class="w-20 bg-white/5 p-1 rounded text-right" value="0"></div>
+            </div>
+            
+            <div class="flex justify-between items-center pt-2 border-t border-white/10 text-xs font-bold">
+                <span>Denomination Total:</span>
+                <span id="denominationTotal" class="text-amber-400">₹0.00</span>
             </div>
 
-            <!-- Summary Totals -->
-            <div class="grid grid-cols-3 gap-4 font-mono text-xs">
-                <div class="glass-card p-4 rounded-xl">Total Credit: <span id="totalCredit" class="text-emerald-400 font-bold">₹0.00</span></div>
-                <div class="glass-card p-4 rounded-xl">Total Debit: <span id="totalDebit" class="text-red-400 font-bold">₹0.00</span></div>
-                <div class="glass-card p-4 rounded-xl">Closing Cash Balance: <span id="closingBalance" class="text-purple-400 font-bold">₹0.00</span></div>
-            </div>
-
-            <!-- Cash Denomination Box -->
-            <div class="glass-card rounded-2xl p-4 space-y-3 no-pdf">
-                <h3 class="text-sm font-bold text-amber-400 border-b border-white/10 pb-2">Cash Denomination Calculator</h3>
-                <div class="grid grid-cols-3 gap-3 text-xs font-mono" id="denomContainer"></div>
-                <div class="flex justify-between items-center border-t border-white/10 pt-3">
-                    <div class="text-xs font-bold">Denomination Total: <span id="denomTotal" class="text-amber-400 font-mono">₹0.00</span></div>
-                    <button onclick="evaluateTallyReport()" class="px-5 py-2 bg-amber-500 text-black font-bold text-xs rounded-xl">Report Audit Check</button>
-                </div>
-                <div id="tallyBadge" class="text-xs font-bold p-2 rounded-xl text-center hidden"></div>
-            </div>
-
-            <!-- Signature Lines (Visible in PDF) -->
-            <div class="flex justify-between pt-12 text-xs font-mono border-t border-white/10">
-                <div>___________________<br>Accountant Sign</div>
-                <div>___________________<br>Manager Sign</div>
-            </div>
+            <!-- Report Status Indicator & Audit Trigger -->
+            <div id="reportAuditStatus" class="p-3 rounded-xl text-center text-xs font-bold hidden"></div>
+            
+            <button id="downloadPdfBtn" onclick="generatePDF()" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold">
+                <i class="fa-solid fa-file-pdf"></i> Generate Signed Audit Report (PDF)
+            </button>
         </div>
     </div>
 
     <script>
-        const notes = [500, 200, 100, 50, 20, 10, 5, 2, 1];
-
-        function initDenom() {
-            const container = document.getElementById('denomContainer');
-            container.innerHTML = '';
-            notes.forEach(n => {
-                container.innerHTML += `
-                    <div class="flex items-center gap-2">
-                        <span class="w-10">₹${n} x</span>
-                        <input type="number" min="0" value="0" id="denom_${n}" oninput="calcDenom()" class="w-20 px-2 py-1 bg-white/5 border border-slate-700 rounded text-white text-xs">
-                        <span id="denom_sum_${n}" class="text-slate-400">₹0</span>
-                    </div>
-                `;
-            });
-        }
-
-        function calcDenom() {
-            let total = 0;
-            notes.forEach(n => {
-                let count = parseInt(document.getElementById(`denom_${n}`).value) || 0;
-                let sum = count * n;
-                document.getElementById(`denom_sum_${n}`).innerText = `₹${sum}`;
-                total += sum;
-            });
-            document.getElementById('denomTotal').innerText = `₹${total.toFixed(2)}`;
-            return total;
-        }
+        let calculatedClosingBalance = 0;
+        let currentDenomTotal = 0;
 
         function loadCashBook() {
-            const cashData = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
+            const list = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
             const tbody = document.getElementById('cashTableBody');
             tbody.innerHTML = '';
-            let credit = 0, debit = 0;
 
-            cashData.forEach((c, idx) => {
-                if(c.type === 'CREDIT') credit += parseFloat(c.amount);
-                else debit += parseFloat(c.amount);
+            let credit = 0;
+            let debit = 0;
+
+            list.forEach(item => {
+                let amt = parseFloat(item.amount) || 0;
+                if (item.type === 'DEBIT') debit += amt;
+                else credit += amt;
 
                 tbody.innerHTML += `
                     <tr>
-                        <td class="p-3 font-mono">${c.date}</td>
-                        <td class="p-3 font-mono text-amber-400">${c.voucherNo}</td>
-                        <td class="p-3">${c.particulars}</td>
-                        <td class="p-3">${c.paymentMode}</td>
-                        <td class="p-3">${c.madeBy}</td>
-                        <td class="p-3 font-mono text-emerald-400">₹${parseFloat(c.amount).toFixed(2)}</td>
-                        <td class="p-3 no-pdf text-center">
-                            <button onclick="deleteCashEntry(${idx})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
-                        </td>
+                        <td class="p-3">${item.date}</td>
+                        <td class="p-3 font-mono text-amber-400">${item.voucherNo}</td>
+                        <td class="p-3">${item.particular}</td>
+                        <td class="p-3">${item.madeBy}</td>
+                        <td class="p-3 font-bold ${item.type==='DEBIT'?'text-rose-400':'text-emerald-400'}">${item.type || 'CREDIT'}</td>
+                        <td class="p-3 font-bold">₹${amt.toFixed(2)}</td>
                     </tr>
                 `;
             });
 
+            calculatedClosingBalance = credit - debit;
             document.getElementById('totalCredit').innerText = `₹${credit.toFixed(2)}`;
             document.getElementById('totalDebit').innerText = `₹${debit.toFixed(2)}`;
-            document.getElementById('closingBalance').innerText = `₹${(credit - debit).toFixed(2)}`;
+            document.getElementById('closingBalance').innerText = `₹${calculatedClosingBalance.toFixed(2)}`;
+
+            calculateDenomination();
         }
 
-        function evaluateTallyReport() {
-            const closing = parseFloat(document.getElementById('closingBalance').innerText.replace('₹', '')) || 0;
-            const denomTotal = calcDenom();
-            const badge = document.getElementById('tallyBadge');
-            badge.classList.remove('hidden', 'bg-emerald-500/20', 'bg-red-500/20', 'bg-blue-500/20', 'text-emerald-400', 'text-red-400', 'text-blue-400');
+        function calculateDenomination() {
+            const getVal = id => parseInt(document.getElementById(id).value) || 0;
+            currentDenomTotal = (getVal('d500')*500) + (getVal('d200')*200) + (getVal('d100')*100) + 
+                                (getVal('d50')*50) + (getVal('d20')*20) + (getVal('d10')*10) + 
+                                (getVal('d5')*5) + (getVal('d2')*2) + (getVal('d1')*1);
 
-            if(denomTotal === closing) {
-                badge.classList.add('bg-emerald-500/20', 'text-emerald-400');
-                badge.innerText = "✅ TALLY OK! Cash Denomination matches Closing Balance.";
-            } else if(denomTotal < closing) {
-                badge.classList.add('bg-red-500/20', 'text-red-400');
-                badge.innerText = `⚠️ MISMATCH! Denomination Shortage: -₹${(closing - denomTotal).toFixed(2)}`;
+            document.getElementById('denominationTotal').innerText = `₹${currentDenomTotal.toFixed(2)}`;
+            
+            const statusBox = document.getElementById('reportAuditStatus');
+            statusBox.classList.remove('hidden', 'bg-emerald-600/30', 'text-emerald-400', 'bg-rose-600/30', 'text-rose-400', 'bg-blue-600/30', 'text-blue-400');
+
+            if (currentDenomTotal === calculatedClosingBalance) {
+                statusBox.classList.add('bg-emerald-600/30', 'text-emerald-400');
+                statusBox.innerText = "TALLY MATCHED: Denomination equals Closing Cash Balance!";
+            } else if (currentDenomTotal < calculatedClosingBalance) {
+                let diff = calculatedClosingBalance - currentDenomTotal;
+                statusBox.classList.add('bg-rose-600/30', 'text-rose-400');
+                statusBox.innerText = `MISMATCH (SHORTAGE): Short by ₹${diff.toFixed(2)}`;
             } else {
-                badge.classList.add('bg-blue-500/20', 'text-blue-400');
-                badge.innerText = `ℹ️ MISMATCH! Denomination Excess: +₹${(denomTotal - closing).toFixed(2)}`;
+                let diff = currentDenomTotal - calculatedClosingBalance;
+                statusBox.classList.add('bg-blue-600/30', 'text-blue-400');
+                statusBox.innerText = `MISMATCH (EXCESS): Excess by ₹${diff.toFixed(2)}`;
             }
         }
 
-        function deleteCashEntry(idx) {
-            let cashData = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
-            cashData.splice(idx, 1);
-            localStorage.setItem('vp_cash_book', JSON.stringify(cashData));
-            loadCashBook();
-        }
-
         function generatePDF() {
-            const element = document.getElementById('pdfContent');
-            html2pdf().from(element).save('Cash_Book_Report.pdf');
+            if (currentDenomTotal !== calculatedClosingBalance) {
+                alert("⚠️ Cannot download report! Denomination total must tally with Closing Cash Balance.");
+                return;
+            }
+            
+            let win = window.open('', '_blank');
+            win.document.write(`
+                <html>
+                <head><title>Cash Book Audit Report</title></head>
+                <body style="font-family: sans-serif; padding: 20px; text-color: #000;">
+                    <h2 style="text-align: center;">VP MICROFINANCE PRO - CASH AUDIT REPORT</h2>
+                    <hr/>
+                    <p><b>Date:</b> ${new Date().toLocaleDateString()}</p>
+                    <table border="1" width="100%" cellpadding="5" cellspacing="0" style="font-size: 12px; border-collapse: collapse;">
+                        <thead>
+                            <tr><th>Date</th><th>Voucher No</th><th>Particulars</th><th>Payment Mode</th><th>Made By</th><th>Amount</th></tr>
+                        </thead>
+                        <tbody>
+                            ${document.getElementById('cashTableBody').innerHTML}
+                        </tbody>
+                    </table>
+                    <br/>
+                    <p><b>Total Credit:</b> ${document.getElementById('totalCredit').innerText}</p>
+                    <p><b>Total Debit:</b> ${document.getElementById('totalDebit').innerText}</p>
+                    <p><b>Closing Cash Balance:</b> ${document.getElementById('closingBalance').innerText}</p>
+                    <hr/>
+                    <h4>Verified Cash Denomination Total: ₹${currentDenomTotal.toFixed(2)}</h4>
+                    <br/><br/><br/>
+                    <table width="100%">
+                        <tr>
+                            <td align="left">_______________________<br/><b>Accountant Sign</b></td>
+                            <td align="right">_______________________<br/><b>Manager Sign</b></td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
+            `);
+            win.document.close();
+            win.print();
         }
 
-        window.onload = () => { initDenom(); loadCashBook(); };
+        window.onload = loadCashBook;
     </script>
 </body>
 </html>
