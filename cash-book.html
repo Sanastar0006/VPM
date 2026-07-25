@@ -12,7 +12,12 @@
 </head>
 <body class="p-6">
     <div class="max-w-7xl mx-auto space-y-6">
-        <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-wallet text-amber-500"></i> Cash Book & Daily Audit Hub</h2>
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white"><i class="fa-solid fa-wallet text-amber-500"></i> Cash Book & Daily Audit Hub</h2>
+            <a href="transaction.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl">
+                <i class="fa-solid fa-arrow-left"></i> Back to Terminal
+            </a>
+        </div>
         
         <!-- Cash Book Table -->
         <div class="glass-card rounded-2xl p-4 overflow-x-auto">
@@ -25,6 +30,7 @@
                         <th class="p-3">Made By</th>
                         <th class="p-3">Type</th>
                         <th class="p-3">Amount</th>
+                        <th class="p-3 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="cashTableBody" class="divide-y divide-white/5"></tbody>
@@ -57,12 +63,59 @@
                 <span id="denominationTotal" class="text-amber-400">₹0.00</span>
             </div>
 
-            <!-- Report Status Indicator & Audit Trigger -->
             <div id="reportAuditStatus" class="p-3 rounded-xl text-center text-xs font-bold hidden"></div>
             
             <button id="downloadPdfBtn" onclick="generatePDF()" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold">
                 <i class="fa-solid fa-file-pdf"></i> Generate Signed Audit Report (PDF)
             </button>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Cash Entry -->
+    <div id="editModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-[#0f1524] border border-white/10 p-6 rounded-2xl max-w-md w-full space-y-4">
+            <h3 class="text-sm font-bold text-white border-b border-white/10 pb-2"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Cash Entry</h3>
+            <input type="hidden" id="editIndex">
+            
+            <div>
+                <label class="block text-[10px] text-slate-400 uppercase mb-1">Date</label>
+                <input type="date" id="editDate" class="w-full bg-white/5 border border-slate-700 p-2 rounded text-xs text-white">
+            </div>
+            <div>
+                <label class="block text-[10px] text-slate-400 uppercase mb-1">Voucher No</label>
+                <input type="text" id="editVoucherNo" class="w-full bg-white/5 border border-slate-700 p-2 rounded text-xs text-white">
+            </div>
+            <div>
+                <label class="block text-[10px] text-slate-400 uppercase mb-1">Particulars</label>
+                <input type="text" id="editParticular" class="w-full bg-white/5 border border-slate-700 p-2 rounded text-xs text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase mb-1">Made By</label>
+                    <select id="editMadeBy" class="w-full bg-[#0f1524] border border-slate-700 p-2 rounded text-xs text-white">
+                        <option value="Admin / Branch Mgr">Admin / Branch Mgr</option>
+                        <option value="Field Officer 1">Field Officer 1</option>
+                        <option value="Field Officer 2">Field Officer 2</option>
+                        <option value="Cashier">Cashier</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase mb-1">Type</label>
+                    <select id="editType" class="w-full bg-[#0f1524] border border-slate-700 p-2 rounded text-xs text-white">
+                        <option value="CREDIT">CREDIT</option>
+                        <option value="DEBIT">DEBIT</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] text-slate-400 uppercase mb-1">Amount (₹)</label>
+                <input type="number" step="0.01" id="editAmount" class="w-full bg-white/5 border border-slate-700 p-2 rounded text-xs text-white font-mono">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-white/10">
+                <button onclick="closeEditModal()" class="px-3 py-1.5 bg-white/10 text-slate-300 text-xs rounded-xl">Cancel</button>
+                <button onclick="saveCashEdit()" class="px-4 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-xl">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -78,22 +131,34 @@
             let credit = 0;
             let debit = 0;
 
-            list.forEach(item => {
-                let amt = parseFloat(item.amount) || 0;
-                if (item.type === 'DEBIT') debit += amt;
-                else credit += amt;
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500 italic">No cash entries found!</td></tr>`;
+            } else {
+                list.forEach((item, index) => {
+                    let amt = parseFloat(item.amount) || 0;
+                    if (item.type === 'DEBIT') debit += amt;
+                    else credit += amt;
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="p-3">${item.date}</td>
-                        <td class="p-3 font-mono text-amber-400">${item.voucherNo}</td>
-                        <td class="p-3">${item.particular}</td>
-                        <td class="p-3">${item.madeBy}</td>
-                        <td class="p-3 font-bold ${item.type==='DEBIT'?'text-rose-400':'text-emerald-400'}">${item.type || 'CREDIT'}</td>
-                        <td class="p-3 font-bold">₹${amt.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="p-3">${item.date}</td>
+                            <td class="p-3 font-mono text-amber-400">${item.voucherNo || 'N/A'}</td>
+                            <td class="p-3">${item.particular || '-'}</td>
+                            <td class="p-3">${item.madeBy || '-'}</td>
+                            <td class="p-3 font-bold ${item.type === 'DEBIT' ? 'text-rose-400' : 'text-emerald-400'}">${item.type || 'CREDIT'}</td>
+                            <td class="p-3 font-bold">₹${amt.toFixed(2)}</td>
+                            <td class="p-3 text-center space-x-2">
+                                <button onclick="openEditCashModal(${index})" class="px-2 py-1 bg-amber-600/20 text-amber-400 hover:bg-amber-600 hover:text-white rounded text-[11px] font-medium transition-all">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </button>
+                                <button onclick="deleteCashEntry(${index})" class="px-2 py-1 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white rounded text-[11px] font-medium transition-all">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
 
             calculatedClosingBalance = credit - debit;
             document.getElementById('totalCredit').innerText = `₹${credit.toFixed(2)}`;
@@ -101,6 +166,53 @@
             document.getElementById('closingBalance').innerText = `₹${calculatedClosingBalance.toFixed(2)}`;
 
             calculateDenomination();
+        }
+
+        function deleteCashEntry(index) {
+            if (confirm("Are you sure you want to delete this cash entry?")) {
+                let list = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
+                list.splice(index, 1);
+                localStorage.setItem('vp_cash_book', JSON.stringify(list));
+                loadCashBook();
+            }
+        }
+
+        function openEditCashModal(index) {
+            let list = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
+            let item = list[index];
+            if (!item) return;
+
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editDate').value = item.date || '';
+            document.getElementById('editVoucherNo').value = item.voucherNo || '';
+            document.getElementById('editParticular').value = item.particular || '';
+            document.getElementById('editMadeBy').value = item.madeBy || 'Admin / Branch Mgr';
+            document.getElementById('editType').value = item.type || 'CREDIT';
+            document.getElementById('editAmount').value = item.amount || 0;
+
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveCashEdit() {
+            let index = document.getElementById('editIndex').value;
+            let list = JSON.parse(localStorage.getItem('vp_cash_book')) || [];
+
+            if (index !== "" && list[index]) {
+                list[index].date = document.getElementById('editDate').value;
+                list[index].voucherNo = document.getElementById('editVoucherNo').value;
+                list[index].particular = document.getElementById('editParticular').value;
+                list[index].madeBy = document.getElementById('editMadeBy').value;
+                list[index].type = document.getElementById('editType').value;
+                list[index].amount = parseFloat(document.getElementById('editAmount').value) || 0;
+
+                localStorage.setItem('vp_cash_book', JSON.stringify(list));
+                closeEditModal();
+                loadCashBook();
+            }
         }
 
         function calculateDenomination() {
@@ -133,41 +245,7 @@
                 alert("⚠️ Cannot download report! Denomination total must tally with Closing Cash Balance.");
                 return;
             }
-            
-            let win = window.open('', '_blank');
-            win.document.write(`
-                <html>
-                <head><title>Cash Book Audit Report</title></head>
-                <body style="font-family: sans-serif; padding: 20px; text-color: #000;">
-                    <h2 style="text-align: center;">VP MICROFINANCE PRO - CASH AUDIT REPORT</h2>
-                    <hr/>
-                    <p><b>Date:</b> ${new Date().toLocaleDateString()}</p>
-                    <table border="1" width="100%" cellpadding="5" cellspacing="0" style="font-size: 12px; border-collapse: collapse;">
-                        <thead>
-                            <tr><th>Date</th><th>Voucher No</th><th>Particulars</th><th>Payment Mode</th><th>Made By</th><th>Amount</th></tr>
-                        </thead>
-                        <tbody>
-                            ${document.getElementById('cashTableBody').innerHTML}
-                        </tbody>
-                    </table>
-                    <br/>
-                    <p><b>Total Credit:</b> ${document.getElementById('totalCredit').innerText}</p>
-                    <p><b>Total Debit:</b> ${document.getElementById('totalDebit').innerText}</p>
-                    <p><b>Closing Cash Balance:</b> ${document.getElementById('closingBalance').innerText}</p>
-                    <hr/>
-                    <h4>Verified Cash Denomination Total: ₹${currentDenomTotal.toFixed(2)}</h4>
-                    <br/><br/><br/>
-                    <table width="100%">
-                        <tr>
-                            <td align="left">_______________________<br/><b>Accountant Sign</b></td>
-                            <td align="right">_______________________<br/><b>Manager Sign</b></td>
-                        </tr>
-                    </table>
-                </body>
-                </html>
-            `);
-            win.document.close();
-            win.print();
+            window.print();
         }
 
         window.onload = loadCashBook;
