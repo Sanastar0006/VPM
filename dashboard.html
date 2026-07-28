@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Matrix | VP MICROFINANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#060814] text-slate-100 min-h-screen p-6 font-['Poppins']">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-8">
+            <div>
+                <h1 class="text-xl font-bold text-white">VP Microfinance Terminal</h1>
+                <p class="text-xs text-purple-400" id="welcomeUser">Welcome Authorized Partner</p>
+            </div>
+            <button onclick="logout()" class="px-4 py-2 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl text-xs font-semibold border border-rose-500/30 transition-all">
+                <i class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <a href="passbook.html" class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500 transition-all">
+                <i class="fa-solid fa-book-open text-2xl text-purple-400 mb-3"></i>
+                <h3 class="font-bold text-sm">Customer Passbook</h3>
+                <p class="text-xs text-slate-400 mt-1">View repayment schedule and download passbook PDF.</p>
+            </a>
+            <a href="user-add.html" class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500 transition-all">
+                <i class="fa-solid fa-user-plus text-2xl text-emerald-400 mb-3"></i>
+                <h3 class="font-bold text-sm">Add New Employee</h3>
+                <p class="text-xs text-slate-400 mt-1">Register employee details and setup system access.</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const activeSession = JSON.parse(localStorage.getItem('vp_active_session'));
+        if(activeSession) {
+            document.getElementById('welcomeUser').innerText = `Logged in as: ${activeSession.firstName} ${activeSession.lastName} (${activeSession.userId})`;
+        }
+        function logout() {
+            localStorage.removeItem('vp_active_session');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
