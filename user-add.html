@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employee & User Credentials | VP MICROFINANCE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+        }
+        .yono-gradient {
+            background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px rgba(255, 255, 255, 0.08) solid;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl relative z-10 my-8">
+        <!-- Top Back Navigation -->
+        <div class="flex justify-between items-center mb-6">
+            <a href="index.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Login
+            </a>
+            <span class="text-xs text-purple-400 font-bold uppercase tracking-wider">VP Microfinance Registry</span>
+        </div>
+
+        <div class="glass-panel w-full rounded-3xl p-6 md:p-8 shadow-2xl relative border border-white/10">
+            
+            <!-- STEP 1: EMPLOYEE DETAILS FORM -->
+            <div id="step1Container">
+                <div class="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-id-card text-purple-400 mr-2"></i> Employee Details</h2>
+                        <p class="text-xs text-slate-400">Step 1 of 2: Personal & Salary Calculation Matrix</p>
+                    </div>
+                    <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Step 1</span>
+                </div>
+
+                <form id="empDetailsForm" onsubmit="goToStep2(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">First Name <span class="text-rose-500">*</span></label>
+                            <input type="text" id="empFirstName" required class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Last Name <span class="text-rose-500">*</span></label>
+                            <input type="text" id="empLastName" required class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Email ID <span class="text-rose-500">*</span></label>
+                            <input type="email" id="empEmail" required class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Phone Number <span class="text-rose-500">*</span></label>
+                            <input type="tel" id="empPhone" required pattern="[0-9]{10}" placeholder="10 Digit Mobile No" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Blood Group <span class="text-rose-500">*</span></label>
+                            <select id="empBloodGroup" required class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Emergency Contact No <span class="text-rose-500">*</span></label>
+                            <input type="tel" id="empEmergency" required class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Designation <span class="text-rose-500">*</span></label>
+                            <input type="text" id="empDesignation" required placeholder="e.g. Field Officer, Collection Agent" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Salary Breakdown Header -->
+                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider pt-2 border-t border-white/10">Salary Structure</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Basic Salary <span class="text-rose-500">*</span></label>
+                            <input type="number" id="basicSalary" oninput="calculatePayroll()" required min="0" placeholder="0.00" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Allowance</label>
+                            <input type="number" id="allowance" oninput="calculatePayroll()" value="0" min="0" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Target Achieve Gift</label>
+                            <input type="number" id="targetGift" oninput="calculatePayroll()" value="0" min="0" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Fine Deduction</label>
+                            <input type="number" id="fine" oninput="calculatePayroll()" value="0" min="0" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-rose-400 focus:border-purple-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">LOP (Loss of Pay)</label>
+                            <input type="number" id="lop" oninput="calculatePayroll()" value="0" min="0" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-rose-400 focus:border-purple-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Auto Calculated System Breakdown -->
+                    <div class="grid grid-cols-3 gap-2 p-3 bg-white/5 rounded-xl border border-white/5">
+                        <div>
+                            <span class="block text-[9px] text-slate-400 uppercase">PF (12% Auto)</span>
+                            <span id="pfVal" class="text-xs font-mono font-bold text-amber-400">₹0.00</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] text-slate-400 uppercase">ESI (0.75% Auto)</span>
+                            <span id="esiVal" class="text-xs font-mono font-bold text-amber-400">₹0.00</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] text-slate-400 uppercase">HRA (40% Auto)</span>
+                            <span id="hraVal" class="text-xs font-mono font-bold text-amber-400">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 bg-purple-950/40 rounded-xl border border-purple-500/30">
+                        <span class="text-xs font-bold text-white uppercase">Calculated Net Salary:</span>
+                        <span id="netSalaryVal" class="text-base font-bold font-mono text-emerald-400">₹0.00</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 yono-gradient text-white rounded-xl font-semibold text-xs tracking-wider shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                        <span>NEXT: CREATE CREDENTIALS</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- STEP 2: USER CREDENTIALS FORM -->
+            <div id="step2Container" class="hidden">
+                <div class="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-user-lock text-purple-400 mr-2"></i> Create User Account</h2>
+                        <p class="text-xs text-slate-400">Step 2 of 2: Set Credentials for Portal Access</p>
+                    </div>
+                    <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Step 2</span>
+                </div>
+
+                <form id="userCredsForm" onsubmit="finalizeUserCreation(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Create User ID / Agent Username <span class="text-rose-500">*</span></label>
+                        <input type="text" id="createUserId" required placeholder="e.g. VP_AGENT_01" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Create Password <span class="text-rose-500">*</span></label>
+                        <input type="password" id="createPassword" required placeholder="••••••••" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Confirm Password <span class="text-rose-500">*</span></label>
+                        <input type="password" id="confirmPassword" required placeholder="••••••••" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="backToStep1()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition-all">
+                            Back
+                        </button>
+                        <button type="submit" class="w-2/3 py-3 yono-gradient text-white rounded-xl font-semibold text-xs tracking-wider shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-check-circle"></i> SUBMIT & REGISTER
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let tempEmpData = {};
+
+        function calculatePayroll() {
+            const basic = parseFloat(document.getElementById('basicSalary').value) || 0;
+            const allowance = parseFloat(document.getElementById('allowance').value) || 0;
+            const targetGift = parseFloat(document.getElementById('targetGift').value) || 0;
+            const fine = parseFloat(document.getElementById('fine').value) || 0;
+            const lop = parseFloat(document.getElementById('lop').value) || 0;
+
+            const pf = basic * 0.12;
+            const esi = basic * 0.0075;
+            const hra = basic * 0.40;
+
+            const netSalary = basic + allowance + targetGift - fine - lop - pf - esi - hra;
+
+            document.getElementById('pfVal').innerText = `₹${pf.toFixed(2)}`;
+            document.getElementById('esiVal').innerText = `₹${esi.toFixed(2)}`;
+            document.getElementById('hraVal').innerText = `₹${hra.toFixed(2)}`;
+            document.getElementById('netSalaryVal').innerText = `₹${Math.max(0, netSalary).toFixed(2)}`;
+
+            return { basic, allowance, targetGift, fine, lop, pf, esi, hra, netSalary };
+        }
+
+        function goToStep2(e) {
+            e.preventDefault();
+            const salaryObj = calculatePayroll();
+
+            tempEmpData = {
+                firstName: document.getElementById('empFirstName').value.trim(),
+                lastName: document.getElementById('empLastName').value.trim(),
+                email: document.getElementById('empEmail').value.trim(),
+                phone: document.getElementById('empPhone').value.trim(),
+                bloodGroup: document.getElementById('empBloodGroup').value,
+                emergencyContact: document.getElementById('empEmergency').value.trim(),
+                designation: document.getElementById('empDesignation').value.trim(),
+                payroll: salaryObj
+            };
+
+            document.getElementById('step1Container').classList.add('hidden');
+            document.getElementById('step2Container').classList.remove('hidden');
+        }
+
+        function backToStep1() {
+            document.getElementById('step2Container').classList.add('hidden');
+            document.getElementById('step1Container').classList.remove('hidden');
+        }
+
+        function finalizeUserCreation(e) {
+            e.preventDefault();
+            const userId = document.getElementById('createUserId').value.trim();
+            const pwd = document.getElementById('createPassword').value.trim();
+            const confirmPwd = document.getElementById('confirmPassword').value.trim();
+
+            if (pwd !== confirmPwd) {
+                alert('Passwords do not match! Please check again.');
+                return;
+            }
+
+            let registeredUsers = JSON.parse(localStorage.getItem('vp_registered_users')) || [];
+
+            // Check if user ID already exists
+            const existing = registeredUsers.find(u => u.userId.toLowerCase() === userId.toLowerCase());
+            if (existing) {
+                alert('User ID already exists! Please choose another User ID.');
+                return;
+            }
+
+            const completeUserData = {
+                ...tempEmpData,
+                userId: userId,
+                password: pwd,
+                createdDate: new Date().toISOString()
+            };
+
+            registeredUsers.push(completeUserData);
+            localStorage.setItem('vp_registered_users', JSON.stringify(registeredUsers));
+
+            alert(`User '${userId}' created successfully! You can now log in.`);
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
