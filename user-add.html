@@ -27,7 +27,6 @@
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-2xl relative z-10 my-8">
-        <!-- Top Back Navigation -->
         <div class="flex justify-between items-center mb-6">
             <a href="employee-details.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-2">
                 <i class="fa-solid fa-arrow-left"></i> Back to Employee Directory
@@ -87,15 +86,12 @@
                             <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Designation <span class="text-rose-500">*</span></label>
                             <input type="text" id="empDesignation" required placeholder="e.g. Field Officer, Collection Agent" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
                         </div>
-                        
-                        <!-- ADDED ADDRESS FIELD HERE -->
                         <div class="md:col-span-2">
                             <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Address <span class="text-rose-500">*</span></label>
                             <textarea id="empAddress" required rows="2" placeholder="Enter residential address" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"></textarea>
                         </div>
                     </div>
 
-                    <!-- Salary Breakdown Header -->
                     <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider pt-2 border-t border-white/10">Salary Structure</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -121,7 +117,6 @@
                         </div>
                     </div>
 
-                    <!-- Auto Calculated System Breakdown -->
                     <div class="grid grid-cols-3 gap-2 p-3 bg-white/5 rounded-xl border border-white/5">
                         <div>
                             <span class="block text-[9px] text-slate-400 uppercase">PF (12% Auto)</span>
@@ -149,12 +144,12 @@
                 </form>
             </div>
 
-            <!-- STEP 2: USER CREDENTIALS FORM -->
+            <!-- STEP 2: USER CREDENTIALS & ACCESS ROLE FORM -->
             <div id="step2Container" class="hidden">
                 <div class="border-b border-white/10 pb-4 mb-6 flex justify-between items-center">
                     <div>
                         <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-user-lock text-purple-400 mr-2"></i> Create User Account</h2>
-                        <p class="text-xs text-slate-400">Step 2 of 2: Set Credentials for Portal Access</p>
+                        <p class="text-xs text-slate-400">Step 2 of 2: Set Credentials & Access Permissions</p>
                     </div>
                     <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">Step 2</span>
                 </div>
@@ -163,6 +158,15 @@
                     <div>
                         <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Create User ID / Agent Username <span class="text-rose-500">*</span></label>
                         <input type="text" id="createUserId" required placeholder="e.g. VP_AGENT_01" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                    </div>
+
+                    <!-- ACCESS ROLE SELECTION DROPDOWN -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Access Role / Permission <span class="text-rose-500">*</span></label>
+                        <select id="userRole" required class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                            <option value="Agent">Agent / Staff (View Only)</option>
+                            <option value="Admin">Admin (Full Access & Delete Permission)</option>
+                        </select>
                     </div>
 
                     <div>
@@ -225,7 +229,7 @@
                 bloodGroup: document.getElementById('empBloodGroup').value,
                 emergencyContact: document.getElementById('empEmergency').value.trim(),
                 designation: document.getElementById('empDesignation').value.trim(),
-                address: document.getElementById('empAddress').value.trim(), // UPDATED: Capturing address!
+                address: document.getElementById('empAddress').value.trim(),
                 payroll: salaryObj
             };
 
@@ -241,6 +245,7 @@
         function finalizeUserCreation(e) {
             e.preventDefault();
             const userId = document.getElementById('createUserId').value.trim();
+            const role = document.getElementById('userRole').value;
             const pwd = document.getElementById('createPassword').value.trim();
             const confirmPwd = document.getElementById('confirmPassword').value.trim();
 
@@ -251,7 +256,6 @@
 
             let registeredUsers = JSON.parse(localStorage.getItem('vp_registered_users')) || [];
 
-            // Check if user ID already exists
             const existing = registeredUsers.find(u => u.userId.toLowerCase() === userId.toLowerCase());
             if (existing) {
                 alert('User ID already exists! Please choose another User ID.');
@@ -261,6 +265,7 @@
             const completeUserData = {
                 ...tempEmpData,
                 userId: userId,
+                role: role, // Storing Selected Role
                 password: pwd,
                 createdDate: new Date().toISOString()
             };
@@ -268,8 +273,8 @@
             registeredUsers.push(completeUserData);
             localStorage.setItem('vp_registered_users', JSON.stringify(registeredUsers));
 
-            alert(`User '${userId}' created successfully! Redirecting to Employee Directory.`);
-            window.location.href = 'employee-details.html'; // UPDATED: Directs directly to employee details!
+            alert(`User '${userId}' created successfully with ${role} Access! Redirecting...`);
+            window.location.href = 'employee-details.html';
         }
     </script>
 </body>
