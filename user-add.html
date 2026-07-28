@@ -29,8 +29,8 @@
     <div class="w-full max-w-2xl relative z-10 my-8">
         <!-- Top Back Navigation -->
         <div class="flex justify-between items-center mb-6">
-            <a href="index.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i> Back to Login
+            <a href="employee-details.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Back to Employee Directory
             </a>
             <span class="text-xs text-purple-400 font-bold uppercase tracking-wider">VP Microfinance Registry</span>
         </div>
@@ -86,6 +86,12 @@
                         <div class="md:col-span-2">
                             <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Designation <span class="text-rose-500">*</span></label>
                             <input type="text" id="empDesignation" required placeholder="e.g. Field Officer, Collection Agent" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        </div>
+                        
+                        <!-- ADDED ADDRESS FIELD HERE -->
+                        <div class="md:col-span-2">
+                            <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Address <span class="text-rose-500">*</span></label>
+                            <textarea id="empAddress" required rows="2" placeholder="Enter residential address" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"></textarea>
                         </div>
                     </div>
 
@@ -219,6 +225,7 @@
                 bloodGroup: document.getElementById('empBloodGroup').value,
                 emergencyContact: document.getElementById('empEmergency').value.trim(),
                 designation: document.getElementById('empDesignation').value.trim(),
+                address: document.getElementById('empAddress').value.trim(), // UPDATED: Capturing address!
                 payroll: salaryObj
             };
 
@@ -261,8 +268,8 @@
             registeredUsers.push(completeUserData);
             localStorage.setItem('vp_registered_users', JSON.stringify(registeredUsers));
 
-            alert(`User '${userId}' created successfully! You can now log in.`);
-            window.location.href = 'index.html';
+            alert(`User '${userId}' created successfully! Redirecting to Employee Directory.`);
+            window.location.href = 'employee-details.html'; // UPDATED: Directs directly to employee details!
         }
     </script>
 </body>
