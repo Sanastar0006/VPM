@@ -84,7 +84,7 @@
                         <input type="checkbox" id="rememberMe" class="rounded bg-white/5 border-slate-700 text-purple-600 focus:ring-0 focus:ring-offset-0 mr-2 w-4 h-4 accent-purple-600">
                         Remember Me
                     </label>
-                    <a href="#" onclick="alert('Machi, please contact Administrator to reset password.')" class="text-purple-400 hover:text-purple-300 transition-colors font-medium">Forgot Password?</a>
+                    <button type="button" onclick="openForgotModal()" class="text-purple-400 hover:text-purple-300 transition-colors font-medium">Forgot Password?</button>
                 </div>
 
                 <button type="submit" class="w-full mt-2 py-3.5 yono-gradient text-white rounded-xl font-medium tracking-wide shadow-lg shadow-purple-900/30 hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center space-x-2 text-sm">
@@ -97,6 +97,46 @@
         <p class="text-center text-[11px] text-slate-500 mt-6 tracking-wide">
             <i class="fa-solid fa-shield-halved mr-1 text-emerald-500"></i> End-to-End Encrypted Node connection secured for 2026.
         </p>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgotModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 shadow-2xl relative border border-white/10">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-key text-purple-400"></i> Reset Password
+                </h3>
+                <button type="button" onclick="closeForgotModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="forgotForm" onsubmit="handlePasswordReset(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase mb-1">User ID or Email <span class="text-rose-500">*</span></label>
+                    <input type="text" id="resetIdentifier" required placeholder="Enter User ID or Email" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase mb-1">New Password <span class="text-rose-500">*</span></label>
+                    <input type="password" id="resetNewPassword" required placeholder="••••••••" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 uppercase mb-1">Confirm New Password <span class="text-rose-500">*</span></label>
+                    <input type="password" id="resetConfirmPassword" required placeholder="••••••••" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeForgotModal()" class="w-1/3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-2/3 py-2.5 yono-gradient text-white rounded-xl font-semibold text-xs tracking-wider shadow-lg hover:opacity-90 transition-all">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -129,7 +169,7 @@
             }
 
             // Registered Users Check
-            const foundUser = usersList.find(u => u.userId === uInput && u.password === pInput);
+            const foundUser = usersList.find(u => (u.userId === uInput || u.email === uInput) && u.password === pInput);
 
             if (foundUser) {
                 alert(`Access Granted! Welcome ${foundUser.firstName}.`);
@@ -138,6 +178,48 @@
             } else {
                 alert('Invalid Username or Password! Access Denied.');
             }
+        }
+
+        // Modal Functions
+        function openForgotModal() {
+            document.getElementById('forgotModal').classList.remove('hidden');
+        }
+
+        function closeForgotModal() {
+            document.getElementById('forgotModal').classList.add('hidden');
+            document.getElementById('forgotForm').reset();
+        }
+
+        function handlePasswordReset(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('resetIdentifier').value.trim();
+            const newPassword = document.getElementById('resetNewPassword').value.trim();
+            const confirmPassword = document.getElementById('resetConfirmPassword').value.trim();
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            let usersList = JSON.parse(localStorage.getItem('vp_registered_users')) || [];
+
+            // Find user by User ID or Email
+            const userIndex = usersList.findIndex(u => 
+                (u.userId && u.userId.toLowerCase() === identifier.toLowerCase()) || 
+                (u.email && u.email.toLowerCase() === identifier.toLowerCase())
+            );
+
+            if (userIndex === -1) {
+                alert('User ID or Email not found in registry!');
+                return;
+            }
+
+            // Update password
+            usersList[userIndex].password = newPassword;
+            localStorage.setItem('vp_registered_users', JSON.stringify(usersList));
+
+            alert('Password updated successfully! You can now log in with your new password.');
+            closeForgotModal();
         }
     </script>
 </body>
