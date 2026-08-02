@@ -140,7 +140,6 @@
             }
 
             filteredReceipts.forEach((r, idx) => {
-                // Get absolute index from original array for edit/delete functions
                 const realIndex = receipts.indexOf(r);
 
                 let row = `
@@ -223,7 +222,6 @@
                 receipts[i].date = newDate.trim();
                 localStorage.setItem('vp_receipts', JSON.stringify(receipts));
                 
-                // Alert Passbook Auto Update
                 alert(`✅ Date updated successfully to ${newDate}!\nThis change will automatically reflect in Passbook Terminal.`);
                 loadReceipts();
             }
@@ -273,7 +271,8 @@
 
         window.onload = loadReceipts;
     </script>
-    <!-- Body tag mudiyurathukku munnadi indha script tag irukanum -->
-<script src="role-access.js"></script>
+    
+    <!-- Role access restriction script -->
+    <script src="role-access.js"></script>
 </body>
 </html>
