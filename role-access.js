@@ -1,70 +1,95 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Get currently logged-in user
-    const activeUser = JSON.parse(localStorage.getItem('vp_active_session'));
+/**
+ * VP MICROFINANCE - Strict Role-Based Access Control (RBAC) System
+ */
 
-    if (!activeUser) {
-        // If not logged in, redirect to login page
-        window.location.href = 'index.html';
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Fetch Logged-in Session
+    const activeSession = JSON.parse(localStorage.getItem('vp_active_session'));
+
+    if (!activeSession) {
+        // Redirect to login if unauthenticated
+        if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('login.html')) {
+            window.location.href = 'index.html';
+        }
         return;
     }
 
-    const role = activeUser.role || 'Collection Staff';
+    const userRole = (activeSession.role || '').trim();
 
-    console.log(`[VP Microfinance RBAC] Active User: ${activeUser.userId} | Role: ${role}`);
+    console.log(`[RBAC Matrix] User: ${activeUserIdentifier(activeSession)} | Role: ${userRole}`);
 
-    // Helper to hide elements by class or selector
-    const hideElements = (selector) => {
-        document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
-    };
-
-    // Helper to disable buttons
-    const disableElements = (selector) => {
+    // Helper utilities
+    const hide = (selector) => {
         document.querySelectorAll(selector).forEach(el => {
-            el.disabled = true;
-            el.classList.add('opacity-50', 'cursor-not-allowed');
+            el.style.display = 'none';
+            el.classList.add('hidden');
         });
     };
 
-    // 1. COLLECTION STAFF RESTRICTIONS
-    if (role === 'Collection Staff') {
-        // Block all menu items/pages except: Passbook, Customer Receipt, Receipts Hub, Passbook Terminal
-        hideElements('.menu-capital-disbursement');
-        hideElements('.menu-customer-list');
-        hideElements('.menu-add-employee');
-        hideElements('.menu-employee-directory');
-        hideElements('.menu-reports');
-        hideElements('.menu-settings');
+    const disable = (selector) => {
+        document.querySelectorAll(selector).forEach(el => {
+            el.disabled = true;
+            el.removeAttribute('href');
+            el.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        });
+    };
 
-        // On Receipts Hub: Allow View & Duplicate Print only. Hide Edit, Delete, or Export options.
-        hideElements('.receipt-delete-btn');
-        hideElements('.receipt-edit-btn');
-        hideElements('.receipt-export-btn');
+    // ----------------------------------------------------------------------
+    // 1. COLLECTION STAFF ACCESS RULES
+    // ----------------------------------------------------------------------
+    if (userRole === 'Collection Staff' || userRole === 'Agent / Staff (View Only)') {
+        
+        // --- Dashboard Navigation & Cards Restriction ---
+        hide('#card-capital-disbursement, .card-capital');
+        hide('#card-customer-list, .card-customers');
+        hide('#card-add-employee, .card-add-emp');
+        hide('#card-employee-details, .card-emp-details');
+        hide('#card-cash-book, .card-cashbook');
+        hide('#card-bank-book, .card-bankbook');
+        hide('#card-reports, .card-reports');
 
-        // On Customer Passbook Terminal: Block any Payment triggers or adjustment buttons if present
-        hideElements('.passbook-pay-btn');
-        hideElements('.passbook-adjust-btn');
+        // Show ONLY permitted menu options
+        // Allowed: Passbook, Customer Receipt Entry, Receipts Hub (View/Duplicate only), Passbook Terminal
+
+        // --- Receipts Hub & Collections Registry Restrictions ---
+        // Hide Delete & Edit & Export; Show ONLY View & Duplicate Print
+        hide('.btn-receipt-delete, .delete-receipt, .btn-delete');
+        hide('.btn-receipt-edit, .edit-receipt, .btn-edit');
+        hide('.btn-receipt-export, .export-receipt');
+
+        // --- Customer Passbook Terminal Restrictions ---
+        // Block/Hide any payment operations if triggered here
+        hide('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
-    // 2. ADMIN RESTRICTIONS
-    else if (role === 'Admin') {
-        // Allowed:
+    // ----------------------------------------------------------------------
+    // 2. ADMIN ACCESS RULES
+    // ----------------------------------------------------------------------
+    else if (userRole === 'Admin' || userRole === 'Admin (Full Access & Delete Permission)') {
+        
+        // Admin Allowed Pages:
         // - Capital Disbursement Registry
-        // - Customer List (Edit, View, PDF & Excel Download)
-        // - Receipts Hub (All options EXCEPT Delete)
-        // - Customer Passbook Terminal (Pay option MUST BE HIDDEN)
+        // - Customer List (Edit, View, PDF & Excel Downloads)
+        // - Receipts Hub & Collections Registry (NO Delete Option)
+        // - Customer Passbook Terminal (NO Pay Option)
         // - Add Employee Option
-        // - Employee Details Directory (All options)
+        // - Employee Details Directory (ALL Options)
 
-        // Hide Delete option in Receipts Hub & Collections Registry
-        hideElements('.receipt-delete-btn');
-        hideElements('.delete-btn');
+        // Hide ALL Delete options across Receipts Hub & Collections Registry
+        hide('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
 
         // Hide Pay option in Customer Passbook Terminal
-        hideElements('.passbook-pay-btn');
+        hide('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
-    // 3. ACCOUNTANT & 4. MANAGEMENT (FULL ACCESS)
-    else if (role === 'Accountant' || role === 'Management') {
-        // No restrictions applied. Everything visible.
+    // ----------------------------------------------------------------------
+    // 3. ACCOUNTANT & 4. MANAGEMENT (SUPER MASTER ACCESS)
+    // ----------------------------------------------------------------------
+    else if (userRole === 'Accountant' || userRole === 'Management') {
+        // Zero Restrictions - Full Access Granted
     }
 });
+
+function activeUserIdentifier(user) {
+    return user.userId || user.email || 'User';
+}
