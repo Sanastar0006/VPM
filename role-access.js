@@ -8,15 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!activeSession) {
         // Redirect to login if unauthenticated
-        if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('login.html')) {
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage !== 'index.html' && currentPage !== 'login.html' && currentPage !== '') {
             window.location.href = 'index.html';
         }
         return;
     }
 
-    const userRole = (activeSession.role || '').trim();
+    const userRole = (activeSession.role || '').trim().toLowerCase();
+    const currentPage = window.location.pathname.split('/').pop();
 
-    console.log(`[RBAC Matrix] User: ${activeUserIdentifier(activeSession)} | Role: ${userRole}`);
+    console.log(`[RBAC Matrix] User: ${activeUserIdentifier(activeSession)} | Role: ${activeSession.role}`);
 
     // Helper utilities
     const hide = (selector) => {
@@ -26,19 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    const disable = (selector) => {
-        document.querySelectorAll(selector).forEach(el => {
-            el.disabled = true;
-            el.removeAttribute('href');
-            el.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
-        });
-    };
-
     // ----------------------------------------------------------------------
     // 1. COLLECTION STAFF ACCESS RULES
     // ----------------------------------------------------------------------
-    if (userRole === 'Collection Staff' || userRole === 'Agent / Staff (View Only)') {
+    if (userRole.includes('collection staff') || userRole.includes('agent')) {
         
+        // --- Security Guard: Page-level direct URL Block ---
+        const restrictedPagesForStaff = [
+            'customer-add.html',
+            'customer-list.html',
+            'user-add.html',
+            'employee-details.html',
+            'cash-book.html',
+            'bank-book.html'
+        ];
+
+        if (restrictedPagesForStaff.includes(currentPage)) {
+            alert('Access Denied: You do not have permission to view this page.');
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
         // --- Dashboard Navigation & Cards Restriction ---
         hide('#card-capital-disbursement, .card-capital');
         hide('#card-customer-list, .card-customers');
@@ -48,33 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         hide('#card-bank-book, .card-bankbook');
         hide('#card-reports, .card-reports');
 
-        // Show ONLY permitted menu options
-        // Allowed: Passbook, Customer Receipt Entry, Receipts Hub (View/Duplicate only), Passbook Terminal
-
         // --- Receipts Hub & Collections Registry Restrictions ---
-        // Hide Delete & Edit & Export; Show ONLY View & Duplicate Print
         hide('.btn-receipt-delete, .delete-receipt, .btn-delete');
         hide('.btn-receipt-edit, .edit-receipt, .btn-edit');
         hide('.btn-receipt-export, .export-receipt');
 
         // --- Customer Passbook Terminal Restrictions ---
-        // Block/Hide any payment operations if triggered here
         hide('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
     // ----------------------------------------------------------------------
     // 2. ADMIN ACCESS RULES
     // ----------------------------------------------------------------------
-    else if (userRole === 'Admin' || userRole === 'Admin (Full Access & Delete Permission)') {
+    else if (userRole.includes('admin')) {
         
-        // Admin Allowed Pages:
-        // - Capital Disbursement Registry
-        // - Customer List (Edit, View, PDF & Excel Downloads)
-        // - Receipts Hub & Collections Registry (NO Delete Option)
-        // - Customer Passbook Terminal (NO Pay Option)
-        // - Add Employee Option
-        // - Employee Details Directory (ALL Options)
-
         // Hide ALL Delete options across Receipts Hub & Collections Registry
         hide('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
 
@@ -85,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
     // 3. ACCOUNTANT & 4. MANAGEMENT (SUPER MASTER ACCESS)
     // ----------------------------------------------------------------------
-    else if (userRole === 'Accountant' || userRole === 'Management') {
+    else if (userRole.includes('accountant') || userRole.includes('management')) {
         // Zero Restrictions - Full Access Granted
     }
 });
