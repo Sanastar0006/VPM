@@ -157,15 +157,17 @@
                 <form id="userCredsForm" onsubmit="finalizeUserCreation(event)" class="space-y-4">
                     <div>
                         <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Create User ID / Agent Username <span class="text-rose-500">*</span></label>
-                        <input type="text" id="createUserId" required placeholder="e.g. VP_AGENT_01" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
+                        <input type="text" id="createUserId" required placeholder="e.g. jenat@vpm.in" class="w-full bg-white/5 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
                     </div>
 
-                    <!-- ACCESS ROLE SELECTION DROPDOWN -->
+                    <!-- UPDATED ACCESS ROLE SELECTION DROPDOWN -->
                     <div>
                         <label class="block text-[11px] font-medium text-slate-300 uppercase mb-1">Access Role / Permission <span class="text-rose-500">*</span></label>
                         <select id="userRole" required class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-purple-500 focus:outline-none">
-                            <option value="Agent">Agent / Staff (View Only)</option>
-                            <option value="Admin">Admin (Full Access & Delete Permission)</option>
+                            <option value="Collection Staff">Collection Staff (Restricted Field View)</option>
+                            <option value="Admin">Admin (Managerial Access - No Delete)</option>
+                            <option value="Accountant">Accountant (Full System Access)</option>
+                            <option value="Management">Management (Super Master Access)</option>
                         </select>
                     </div>
 
@@ -265,7 +267,7 @@
             const completeUserData = {
                 ...tempEmpData,
                 userId: userId,
-                role: role, // Storing Selected Role
+                role: role,
                 password: pwd,
                 createdDate: new Date().toISOString()
             };
@@ -273,7 +275,7 @@
             registeredUsers.push(completeUserData);
             localStorage.setItem('vp_registered_users', JSON.stringify(registeredUsers));
 
-            alert(`User '${userId}' created successfully with ${role} Access! Redirecting...`);
+            alert(`User '${userId}' registered successfully as [${role}]! Redirecting...`);
             window.location.href = 'employee-details.html';
         }
     </script>
