@@ -1,122 +1,74 @@
-/**
- * VP MICROFINANCE - Strict Role-Based Access Control (RBAC) System
- */
+document.addEventListener("DOMContentLoaded", function () {
+    // Current user role retrieval (Default 'Staff' / 'Collection Staff' or 'Admin')
+    const currentUserRole = localStorage.getItem("vp_user_role") || "Staff"; // e.g., 'Admin', 'Collection Staff', 'Staff'
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Fetch Logged-in Session
-    const activeSession = JSON.parse(localStorage.getItem('vp_active_session'));
+    // --- 1. SIDEBAR ACCESS RESTRICTIONS ---
+    const sidebarLinks = document.querySelectorAll("aside nav a");
 
-    if (!activeSession) {
-        const currentPage = window.location.pathname.split('/').pop();
-        if (currentPage !== 'index.html' && currentPage !== 'login.html' && currentPage !== '') {
-            window.location.href = 'index.html';
+    sidebarLinks.forEach(link => {
+        const text = link.innerText.trim();
+
+        // If User is ADMIN
+        if (currentUserRole.toLowerCase().includes("admin")) {
+            // Hide Cash Book & Bank Book for Admin as requested
+            if (text.includes("Cash Book") || text.includes("Bank Book")) {
+                link.style.display = "none";
+            }
         }
-        return;
+
+        // If User is COLLECTION STAFF
+        if (currentUserRole.toLowerCase().includes("collection") || currentUserRole.toLowerCase().includes("staff")) {
+            // Hide admin-only menu items if needed
+            if (text.includes("Cash Book") || text.includes("Bank Book")) {
+                link.style.display = "none";
+            }
+        }
+    });
+
+    // --- 2. TRANSACTION.HTML SPECIFIC RESTRICTIONS ---
+    if (window.location.pathname.includes("transaction.html")) {
+        if (currentUserRole.toLowerCase().includes("collection") || currentUserRole.toLowerCase().includes("staff")) {
+            // Hide Account Transaction Tab / Form Options for Collection Staff
+            const accountTransTab = document.querySelector("[data-tab='account']") || 
+                                    document.getElementById("accountTransTab") || 
+                                    document.getElementById("accountTransactionSection");
+            
+            if (accountTransTab) {
+                accountTransTab.style.display = "none";
+            }
+
+            // If there's a dropdown option for Account Transaction, hide or disable it
+            const transTypeSelect = document.getElementById("transactionType");
+            if (transTypeSelect) {
+                Array.from(transTypeSelect.options).forEach(option => {
+                    if (option.value.toLowerCase().includes("account") || option.text.toLowerCase().includes("account")) {
+                        option.remove();
+                    }
+                });
+            }
+        }
     }
 
-    const userRole = (activeSession.role || '').trim().toLowerCase();
-    const currentPage = window.location.pathname.split('/').pop();
-
-    console.log(`[RBAC System Active] User Role detected: ${activeSession.role}`);
-
-    // Core Hide Function
-    const hideSelectors = (selectors) => {
-        document.querySelectorAll(selectors).forEach(el => {
-            el.style.display = 'none';
-            el.classList.add('hidden');
-        });
-    };
-
-    // Helper: Hide Sidebar menu items by checking link text or href
-    const filterSidebarMenu = (unauthorizedKeywords) => {
-        // Target sidebar links, nav anchors, and list items
-        const menuItems = document.querySelectorAll('aside a, nav a, .sidebar a, ul li a');
-        
-        menuItems.forEach(link => {
-            const linkText = link.innerText.trim().toLowerCase();
-            const linkHref = link.getAttribute('href') || '';
-
-            unauthorizedKeywords.forEach(keyword => {
-                if (linkText.includes(keyword.toLowerCase()) || linkHref.includes(keyword.toLowerCase())) {
-                    // Hide the parent element (or anchor itself)
-                    const targetEl = link.closest('li') || link;
-                    targetEl.style.display = 'none';
-                    targetEl.classList.add('hidden');
+    // --- 3. DELETE BUTTON HIDING (FOR ADMIN & STAFF) ---
+    // Function to hide delete buttons dynamically (since tables render via JS)
+    function hideDeleteButtons() {
+        if (currentUserRole.toLowerCase().includes("admin") || currentUserRole.toLowerCase().includes("staff")) {
+            // Select all buttons or icons with 'fa-trash', title 'Delete', or delete onclicks
+            const deleteButtons = document.querySelectorAll("button[title*='Delete'], .fa-trash, [onclick*='delete']");
+            
+            deleteButtons.forEach(btn => {
+                const targetBtn = btn.tagName === "I" ? btn.closest("button") || btn : btn;
+                if (targetBtn) {
+                    targetBtn.style.display = "none";
                 }
             });
-        });
-    };
-
-    // ----------------------------------------------------------------------
-    // 1. COLLECTION STAFF ACCESS RULES
-    // ----------------------------------------------------------------------
-    if (userRole.includes('collection staff') || userRole.includes('agent')) {
-        
-        // A. Direct URL Protection Guard (If Staff types restricted URL directly)
-        const restrictedPagesForStaff = [
-            'customer-add.html',
-            'customer-list.html',
-            'user-add.html',
-            'employee-details.html',
-            'cash-book.html',
-            'bank-book.html',
-            'reports.html'
-        ];
-
-        if (restrictedPagesForStaff.includes(currentPage)) {
-            alert('Access Denied: You do not have permission to access this module.');
-            window.location.href = 'dashboard.html';
-            return;
         }
-
-        // B. Dashboard Card Selectors Hide
-        hideSelectors('#card-capital-disbursement, #card-customer-list, #card-add-employee, #card-employee-details, #card-cash-book, #card-bank-book, #card-reports');
-
-        // C. Sidebar Navigation Menu Text Restrictions
-        // Restricts: Capital Disbursement, Customer Ledger/List, Cash Book, Bank Book, Add Employee, Reports
-        const staffRestrictedMenus = [
-            'capital disbursement',
-            'customer ledger',
-            'customer list',
-            'cash book',
-            'bank book',
-            'add employee',
-            'employee details',
-            'reports',
-            'customer-add',
-            'customer-list',
-            'cash-book',
-            'bank-book'
-        ];
-        filterSidebarMenu(staffRestrictedMenus);
-
-        // D. Inner Page Action Buttons Restriction
-        hideSelectors('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
-        hideSelectors('.btn-receipt-edit, .edit-receipt, .btn-edit');
-        hideSelectors('.btn-receipt-export, .export-receipt');
-        hideSelectors('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
-    // ----------------------------------------------------------------------
-    // 2. ADMIN ACCESS RULES
-    // ----------------------------------------------------------------------
-    else if (userRole.includes('admin')) {
-        
-        // Hide ALL Delete options across Receipts Hub & Collections Registry
-        hideSelectors('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
-
-        // Hide Pay option in Customer Passbook Terminal
-        hideSelectors('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
-    }
-
-    // ----------------------------------------------------------------------
-    // 3. ACCOUNTANT & 4. MANAGEMENT (FULL ACCESS)
-    // ----------------------------------------------------------------------
-    else if (userRole.includes('accountant') || userRole.includes('management')) {
-        // Full unrestricted access granted
-    }
+    // Initial check & continuous check for dynamically loaded tables (like loadReceipts)
+    hideDeleteButtons();
+    
+    // MutationObserver to hide trash buttons when data tables load dynamically
+    const observer = new MutationObserver(hideDeleteButtons);
+    observer.observe(document.body, { childList: true, subtree: true });
 });
-
-function activeUserIdentifier(user) {
-    return user.userId || user.email || 'User';
-}
