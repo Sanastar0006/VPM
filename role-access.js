@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeSession = JSON.parse(localStorage.getItem('vp_active_session'));
 
     if (!activeSession) {
-        // Redirect to login if unauthenticated
         const currentPage = window.location.pathname.split('/').pop();
         if (currentPage !== 'index.html' && currentPage !== 'login.html' && currentPage !== '') {
             window.location.href = 'index.html';
@@ -18,13 +17,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const userRole = (activeSession.role || '').trim().toLowerCase();
     const currentPage = window.location.pathname.split('/').pop();
 
-    console.log(`[RBAC Matrix] User: ${activeUserIdentifier(activeSession)} | Role: ${activeSession.role}`);
+    console.log(`[RBAC System Active] User Role detected: ${activeSession.role}`);
 
-    // Helper utilities
-    const hide = (selector) => {
-        document.querySelectorAll(selector).forEach(el => {
+    // Core Hide Function
+    const hideSelectors = (selectors) => {
+        document.querySelectorAll(selectors).forEach(el => {
             el.style.display = 'none';
             el.classList.add('hidden');
+        });
+    };
+
+    // Helper: Hide Sidebar menu items by checking link text or href
+    const filterSidebarMenu = (unauthorizedKeywords) => {
+        // Target sidebar links, nav anchors, and list items
+        const menuItems = document.querySelectorAll('aside a, nav a, .sidebar a, ul li a');
+        
+        menuItems.forEach(link => {
+            const linkText = link.innerText.trim().toLowerCase();
+            const linkHref = link.getAttribute('href') || '';
+
+            unauthorizedKeywords.forEach(keyword => {
+                if (linkText.includes(keyword.toLowerCase()) || linkHref.includes(keyword.toLowerCase())) {
+                    // Hide the parent element (or anchor itself)
+                    const targetEl = link.closest('li') || link;
+                    targetEl.style.display = 'none';
+                    targetEl.classList.add('hidden');
+                }
+            });
         });
     };
 
@@ -33,38 +52,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
     if (userRole.includes('collection staff') || userRole.includes('agent')) {
         
-        // --- Security Guard: Page-level direct URL Block ---
+        // A. Direct URL Protection Guard (If Staff types restricted URL directly)
         const restrictedPagesForStaff = [
             'customer-add.html',
             'customer-list.html',
             'user-add.html',
             'employee-details.html',
             'cash-book.html',
-            'bank-book.html'
+            'bank-book.html',
+            'reports.html'
         ];
 
         if (restrictedPagesForStaff.includes(currentPage)) {
-            alert('Access Denied: You do not have permission to view this page.');
+            alert('Access Denied: You do not have permission to access this module.');
             window.location.href = 'dashboard.html';
             return;
         }
 
-        // --- Dashboard Navigation & Cards Restriction ---
-        hide('#card-capital-disbursement, .card-capital');
-        hide('#card-customer-list, .card-customers');
-        hide('#card-add-employee, .card-add-emp');
-        hide('#card-employee-details, .card-emp-details');
-        hide('#card-cash-book, .card-cashbook');
-        hide('#card-bank-book, .card-bankbook');
-        hide('#card-reports, .card-reports');
+        // B. Dashboard Card Selectors Hide
+        hideSelectors('#card-capital-disbursement, #card-customer-list, #card-add-employee, #card-employee-details, #card-cash-book, #card-bank-book, #card-reports');
 
-        // --- Receipts Hub & Collections Registry Restrictions ---
-        hide('.btn-receipt-delete, .delete-receipt, .btn-delete');
-        hide('.btn-receipt-edit, .edit-receipt, .btn-edit');
-        hide('.btn-receipt-export, .export-receipt');
+        // C. Sidebar Navigation Menu Text Restrictions
+        // Restricts: Capital Disbursement, Customer Ledger/List, Cash Book, Bank Book, Add Employee, Reports
+        const staffRestrictedMenus = [
+            'capital disbursement',
+            'customer ledger',
+            'customer list',
+            'cash book',
+            'bank book',
+            'add employee',
+            'employee details',
+            'reports',
+            'customer-add',
+            'customer-list',
+            'cash-book',
+            'bank-book'
+        ];
+        filterSidebarMenu(staffRestrictedMenus);
 
-        // --- Customer Passbook Terminal Restrictions ---
-        hide('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
+        // D. Inner Page Action Buttons Restriction
+        hideSelectors('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
+        hideSelectors('.btn-receipt-edit, .edit-receipt, .btn-edit');
+        hideSelectors('.btn-receipt-export, .export-receipt');
+        hideSelectors('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
     // ----------------------------------------------------------------------
@@ -73,17 +103,17 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (userRole.includes('admin')) {
         
         // Hide ALL Delete options across Receipts Hub & Collections Registry
-        hide('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
+        hideSelectors('.btn-receipt-delete, .delete-receipt, .btn-delete, .action-delete');
 
         // Hide Pay option in Customer Passbook Terminal
-        hide('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
+        hideSelectors('.btn-passbook-pay, .pay-passbook-btn, .action-pay');
     }
 
     // ----------------------------------------------------------------------
-    // 3. ACCOUNTANT & 4. MANAGEMENT (SUPER MASTER ACCESS)
+    // 3. ACCOUNTANT & 4. MANAGEMENT (FULL ACCESS)
     // ----------------------------------------------------------------------
     else if (userRole.includes('accountant') || userRole.includes('management')) {
-        // Zero Restrictions - Full Access Granted
+        // Full unrestricted access granted
     }
 });
 
