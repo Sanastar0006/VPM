@@ -3,53 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Matrix | VP MICROFINANCE</title>
+    <title>VP Microfinance Terminal | Control Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-[#060814] text-slate-100 min-h-screen p-6 font-['Poppins']">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-8">
-            <div>
-                <h1 class="text-xl font-bold text-white">VP Microfinance Terminal</h1>
-                <p class="text-xs text-purple-400" id="welcomeUser">Welcome Authorized Partner</p>
-            </div>
-            <button onclick="logout()" class="px-4 py-2 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white rounded-xl text-xs font-semibold border border-rose-500/30 transition-all">
-                <i class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="passbook.html" class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500 transition-all">
-                <i class="fa-solid fa-book-open text-2xl text-purple-400 mb-3"></i>
-                <h3 class="font-bold text-sm">Customer Passbook</h3>
-                <p class="text-xs text-slate-400 mt-1">View repayment schedule and download passbook PDF.</p>
-            </a>
-            <a href="user-add.html" class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500 transition-all">
-                <i class="fa-solid fa-user-plus text-2xl text-emerald-400 mb-3"></i>
-                <h3 class="font-bold text-sm">Add New Employee</h3>
-                <p class="text-xs text-slate-400 mt-1">Register employee details and setup system access.</p>
-            </a>
-               <a href="employee-details.html" class="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500 transition-all">
-                <i class="fa-solid fa-user-plus text-2xl text-emerald-400 mb-3"></i>
-                <h3 class="font-bold text-sm">Employee datails</h3>
-                <p class="text-xs text-slate-400 mt-1">VPM_Register employee details View.</p>
-            </a>
-        </div>
-    </div>
-
-    <script>
-        const activeSession = JSON.parse(localStorage.getItem('vp_active_session'));
-        if(activeSession) {
-            document.getElementById('welcomeUser').innerText = `Logged in as: ${activeSession.firstName} ${activeSession.lastName} (${activeSession.userId})`;
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
         }
-        function logout() {
+        .yono-gradient {
+            background: linear-gradient(135deg, #6b21a8 0%, #1e40af 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px rgba(255, 255, 255, 0.08) solid;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 p-6">
+
+    <!-- Header Navigation -->
+    <header class="flex justify-between items-center pb-6 mb-8 border-b border-white/10">
+        <div>
+            <h1 class="text-xl font-bold tracking-wide text-white">VP Microfinance Terminal</h1>
+            <p class="text-xs text-purple-400 font-medium mt-0.5" id="userInfoDisplay">Logged in as: Loading...</p>
+        </div>
+        <button onclick="handleLogout()" class="px-4 py-2 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-400 rounded-xl text-xs font-semibold transition-all flex items-center gap-2">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+        </button>
+    </header>
+
+    <!-- Main Navigation Grid -->
+    <main class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dashboardGrid">
+            
+            <!-- 1. Customer Passbook Terminal (Visible to: Collection Staff, Admin, Accountant, Management) -->
+            <a href="passbook.html" id="card-passbook" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 yono-gradient rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg shadow-purple-900/40 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-book-open text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors">Customer Passbook Terminal</h3>
+                <p class="text-xs text-slate-400 mt-2">View repayment schedules, account statements, and download passbook PDFs.</p>
+            </a>
+
+            <!-- 2. Customer Receipt Entry (Visible to: Collection Staff, Admin, Accountant, Management) -->
+            <a href="receipt.html" id="card-receipt-entry" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-emerald-600 to-teal-400 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-receipt text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Customer Receipt Entry</h3>
+                <p class="text-xs text-slate-400 mt-2">Make instant daily/weekly collection receipt entries for registered loans.</p>
+            </a>
+
+            <!-- 3. Receipts Hub & Collections Registry (Visible to ALL with restricted buttons) -->
+            <a href="transaction.html" id="card-receipts-hub" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-cyan-600 to-blue-500 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-box-archive text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">Receipts Hub & Collections Registry</h3>
+                <p class="text-xs text-slate-400 mt-2">Access collection registries, print duplicate receipts, and audit transactions.</p>
+            </a>
+
+            <!-- 4. Capital Disbursement Registry (Admin, Accountant, Management ONLY) -->
+            <a href="customer-add.html" id="card-capital-disbursement" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-indigo-600 to-purple-500 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">Capital Disbursement Registry</h3>
+                <p class="text-xs text-slate-400 mt-2">Disburse new loan amounts, calculate interest matrices, and register borrowers.</p>
+            </a>
+
+            <!-- 5. Customer Directory List (Admin, Accountant, Management ONLY) -->
+            <a href="customer-list.html" id="card-customer-list" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Customer List Registry</h3>
+                <p class="text-xs text-slate-400 mt-2">View active customer profiles, edit loan terms, and export Excel / PDF reports.</p>
+            </a>
+
+            <!-- 6. Add New Employee (Admin, Accountant, Management ONLY) -->
+            <a href="user-add.html" id="card-add-employee" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-user-plus text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Add New Employee</h3>
+                <p class="text-xs text-slate-400 mt-2">Register new collection staff, assign access roles, and setup user credentials.</p>
+            </a>
+
+            <!-- 7. Employee Details Directory (Admin, Accountant, Management ONLY) -->
+            <a href="employee-details.html" id="card-employee-details" class="glass-card p-6 rounded-3xl hover:border-purple-500/40 transition-all group block">
+                <div class="w-12 h-12 bg-gradient-to-tr from-violet-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-address-book text-xl"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-violet-300 transition-colors">Employee Details Directory</h3>
+                <p class="text-xs text-slate-400 mt-2">View staff salary structures, manage active sessions, and review staff performance.</p>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Global Access Control Logic Engine -->
+    <script src="role-access.js"></script>
+    <script>
+        // Set User Banner Info
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeUser = JSON.parse(localStorage.getItem('vp_active_session'));
+            if(activeUser) {
+                const name = `${activeUser.firstName || ''} ${activeUser.lastName || ''}`.trim() || activeUser.userId;
+                document.getElementById('userInfoDisplay').innerText = `Logged in as: ${name} (${activeUser.role || 'Collection Staff'})`;
+            }
+        });
+
+        function handleLogout() {
             localStorage.removeItem('vp_active_session');
             window.location.href = 'index.html';
         }
     </script>
-    <script src="role-access.js"></script>
-    
 </body>
 </html>
