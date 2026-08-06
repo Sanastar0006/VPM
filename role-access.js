@@ -1,95 +1,124 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Fetch User Role safely from localStorage
-    let rawRole = localStorage.getItem("vp_user_role") || "";
-    if (!rawRole && localStorage.getItem("vp_user")) {
-        try {
-            const userObj = JSON.parse(localStorage.getItem("vp_user"));
-            rawRole = userObj.role || "";
-        } catch (e) { console.error(e); }
+    // 1. Get Role safely from LocalStorage
+    let currentUserRole = "";
+    try {
+        currentUserRole = localStorage.getItem("vp_user_role") || "";
+        if (!currentUserRole && localStorage.getItem("vp_user")) {
+            const u = JSON.parse(localStorage.getItem("vp_user"));
+            currentUserRole = u.role || u.userRole || "";
+        }
+    } catch (e) {
+        console.error("Role fetching error:", e);
     }
-    
-    // Also check page text like "Logged in as: ... (Collection Staff)"
-    const bodyText = document.body.innerText || "";
-    const isCollectionStaff = rawRole.toLowerCase().includes("collection") || 
-                              bodyText.includes("(Collection Staff)");
-    const isAdmin = rawRole.toLowerCase().includes("admin") || 
-                    bodyText.includes("(Admin)");
 
-    // --- RULE A: DASHBOARD CARDS HIDING (For Collection Staff) ---
-    if (window.location.pathname.includes("dashboard.html") || window.location.pathname.endsWith("/")) {
+    // Fallback: Read role from top header text if available
+    const headerRoleText = document.body.innerText || "";
+    const isCollectionStaff = currentUserRole.toLowerCase().includes("collection") || 
+                              headerRoleText.includes("Collection Staff");
+    const isAdmin = currentUserRole.toLowerCase().includes("admin") || 
+                    headerRoleText.includes("(Admin)");
+
+    // =========================================================
+    // RULE 1: DASHBOARD CARDS HIDING (For Collection Staff)
+    // =========================================================
+    if (window.location.pathname.includes("dashboard.html") || window.location.pathname.endsWith("/VPM/")) {
         if (isCollectionStaff) {
-            // Find all cards on Dashboard
-            const cards = document.querySelectorAll(".glass-card, div[class*='rounded'], a[href]");
-            cards.forEach(card => {
-                const text = card.innerText || "";
+            // Find all dashboard card grid items
+            const allDashboardCards = document.querySelectorAll("main .grid > div, main a");
+            allDashboardCards.forEach(card => {
+                const cardText = (card.innerText || "").toLowerCase();
+                
                 // Hide restricted modules on Dashboard for Collection Staff
-                if (text.includes("Capital Disbursement") || 
-                    text.includes("Add New Employee") || 
-                    text.includes("Employee Details") || 
-                    text.includes("Cash Book") || 
-                    text.includes("Bank Book")) {
+                if (cardText.includes("capital disbursement") || 
+                    cardText.includes("add new employee") || 
+                    cardText.includes("employee details") || 
+                    cardText.includes("cash book") || 
+                    cardText.includes("bank book")) {
                     
-                    // If card is wrapped in anchor or grid container, hide it
-                    const parentCard = card.closest("a") || card.closest(".grid > div") || card;
-                    if (parentCard) parentCard.style.display = "none";
+                    card.style.setProperty("display", "none", "important");
                 }
             });
         }
     }
 
-    // --- RULE B: SIDEBAR MENU RESTRICTIONS ---
-    const sidebarLinks = document.querySelectorAll("aside nav a, #sidebar a");
-    sidebarLinks.forEach(link => {
-        const text = link.innerText.trim();
-        
-        // Admin & Collection Staff - Cash Book & Bank Book marayanum
-        if (isAdmin || isCollectionStaff) {
-            if (text.includes("Cash Book") || text.includes("Bank Book")) {
-                link.style.display = "none";
-            }
-        }
+    // =========================================================
+    // RULE 2: SIDEBAR NAVIGATION RESTRICTIONS
+    // =========================================================
+    function applySidebarRestrictions() {
+        const sidebarLinks = document.querySelectorAll("aside nav a, #sidebar nav a");
+        sidebarLinks.forEach(link => {
+            const linkText = (link.innerText || "").toLowerCase();
 
-        // Collection Staff - Admin pages in sidebar
-        if (isCollectionStaff) {
-            if (text.includes("Capital Disbursement") || text.includes("Add New Employee")) {
-                link.style.display = "none";
+            // Admin & Collection Staff -> Hide Cash Book & Bank Book
+            if (isAdmin || isCollectionStaff) {
+                if (linkText.includes("cash book") || linkText.includes("bank book")) {
+                    link.style.setProperty("display", "none", "important");
+                }
             }
-        }
-    });
 
-    // --- RULE C: TRANSACTION.HTML TAB RESTRICTION (Pic 3 Fix) ---
+            // Collection Staff -> Hide Disbursal & Employee creation
+            if (isCollectionStaff) {
+                if (linkText.includes("capital disbursement") || linkText.includes("add employee")) {
+                    link.style.setProperty("display", "none", "important");
+                }
+            }
+        });
+    }
+    applySidebarRestrictions();
+
+    // =========================================================
+    // RULE 3: TRANSACTION.HTML TAB & FORM RESTRICTION (Pic 3 Fix)
+    // =========================================================
     if (window.location.pathname.includes("transaction.html")) {
         if (isCollectionStaff) {
-            // Find all buttons containing text 'Accounts Transaction'
-            const allButtons = document.querySelectorAll("button, div, a");
-            allButtons.forEach(btn => {
-                if (btn.innerText && btn.innerText.includes("Accounts Transaction")) {
-                    btn.style.display = "none"; // Hide Accounts Transaction button/tab
+            // Force hide Accounts Transaction tab/button
+            const hideAccountTxnTab = () => {
+                const buttonsAndTabs = document.querySelectorAll("button, div, a, li");
+                buttonsAndTabs.forEach(elem => {
+                    const txt = (elem.innerText || "").toLowerCase();
+                    if (txt.includes("accounts transaction") || txt.includes("account transaction")) {
+                        elem.style.setProperty("display", "none", "important");
+                    }
+                });
+
+                // Auto Select & Click Customer Receipt Tab if present
+                const receiptBtn = Array.from(document.querySelectorAll("button")).find(b => 
+                    (b.innerText || "").toLowerCase().includes("customer receipt")
+                );
+                if (receiptBtn && !receiptBtn.classList.contains("active")) {
+                    receiptBtn.click();
+                }
+            };
+
+            hideAccountTxnTab();
+            setTimeout(hideAccountTxnTab, 300); // Trigger after dynamic JS render
+        }
+    }
+
+    // =========================================================
+    // RULE 4: DELETE BUTTON HIDING (For Admin & Collection Staff)
+    // =========================================================
+    function applyDeleteRestrictions() {
+        if (isAdmin || isCollectionStaff) {
+            // Target all trash icons, delete buttons, delete onclicks
+            const deleteTargets = document.querySelectorAll(
+                "button[title*='Delete'], button[onclick*='delete'], .fa-trash, .fa-trash-can, [onclick*='deleteReceipt']"
+            );
+
+            deleteTargets.forEach(el => {
+                const targetBtn = el.tagName === "I" ? (el.closest("button") || el) : el;
+                if (targetBtn) {
+                    targetBtn.style.setProperty("display", "none", "important");
                 }
             });
-
-            // Auto-click Customer Receipt Tab if available & show only Receipt Form
-            const receiptTabBtn = Array.from(document.querySelectorAll("button")).find(b => b.innerText.includes("Customer Receipt"));
-            if (receiptTabBtn) {
-                receiptTabBtn.click();
-            }
         }
     }
 
-    // --- RULE D: DELETE BUTTON RESTRICTION (For Admin & Collection Staff) ---
-    function hideDeleteButtons() {
-        if (isAdmin || isCollectionStaff) {
-            // Hide trash icons, delete buttons, delete column headers
-            const deleteElements = document.querySelectorAll("button[title*='Delete'], .fa-trash, [onclick*='delete'], .fa-trash-can");
-            deleteElements.forEach(el => {
-                const target = el.tagName === "I" ? (el.closest("button") || el) : el;
-                if (target) target.style.display = "none";
-            });
-        }
-    }
-
-    // Run delete cleanup & observe dynamic changes
-    hideDeleteButtons();
-    const observer = new MutationObserver(hideDeleteButtons);
+    // Run delete removal continuously for dynamic tables (like Receipts / Ledger)
+    applyDeleteRestrictions();
+    const observer = new MutationObserver(() => {
+        applySidebarRestrictions();
+        applyDeleteRestrictions();
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 });
