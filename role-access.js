@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Current user role retrieval (Default 'Staff' / 'Collection Staff' or 'Admin')
-    const currentUserRole = localStorage.getItem("vp_user_role") || "Staff"; // e.g., 'Admin', 'Collection Staff', 'Staff'
+    // Current user role retrieval (e.g., 'Admin', 'Collection Staff', 'Accountant', 'Management')
+    const currentUserRole = (localStorage.getItem("vp_user_role") || "Staff").trim().toLowerCase();
 
     // --- 1. SIDEBAR ACCESS RESTRICTIONS ---
     const sidebarLinks = document.querySelectorAll("aside nav a");
@@ -8,27 +8,18 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebarLinks.forEach(link => {
         const text = link.innerText.trim();
 
-        // If User is ADMIN
-        if (currentUserRole.toLowerCase().includes("admin")) {
-            // Hide Cash Book & Bank Book for Admin as requested
-            if (text.includes("Cash Book") || text.includes("Bank Book")) {
-                link.style.display = "none";
-            }
-        }
-
-        // If User is COLLECTION STAFF
-        if (currentUserRole.toLowerCase().includes("collection") || currentUserRole.toLowerCase().includes("staff")) {
-            // Hide admin-only menu items if needed
+        // Admin OR Collection Staff-kku Cash Book & Bank Book marayanum
+        if (currentUserRole.includes("admin") || currentUserRole.includes("collection")) {
             if (text.includes("Cash Book") || text.includes("Bank Book")) {
                 link.style.display = "none";
             }
         }
     });
 
-    // --- 2. TRANSACTION.HTML SPECIFIC RESTRICTIONS ---
+    // --- 2. TRANSACTION.HTML SPECIFIC RESTRICTIONS (Collection Staff) ---
     if (window.location.pathname.includes("transaction.html")) {
-        if (currentUserRole.toLowerCase().includes("collection") || currentUserRole.toLowerCase().includes("staff")) {
-            // Hide Account Transaction Tab / Form Options for Collection Staff
+        if (currentUserRole.includes("collection")) {
+            // Hide Account Transaction Tab / Form for Collection Staff
             const accountTransTab = document.querySelector("[data-tab='account']") || 
                                     document.getElementById("accountTransTab") || 
                                     document.getElementById("accountTransactionSection");
@@ -37,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 accountTransTab.style.display = "none";
             }
 
-            // If there's a dropdown option for Account Transaction, hide or disable it
+            // Dropdown option irundha remove pannanum
             const transTypeSelect = document.getElementById("transactionType");
             if (transTypeSelect) {
                 Array.from(transTypeSelect.options).forEach(option => {
@@ -49,11 +40,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // --- 3. DELETE BUTTON HIDING (FOR ADMIN & STAFF) ---
-    // Function to hide delete buttons dynamically (since tables render via JS)
-    function hideDeleteButtons() {
-        if (currentUserRole.toLowerCase().includes("admin") || currentUserRole.toLowerCase().includes("staff")) {
-            // Select all buttons or icons with 'fa-trash', title 'Delete', or delete onclicks
+    // --- 3. DELETE BUTTON RESTRICTION LOGIC ---
+    function applyDeleteRestrictions() {
+        // ONLY Admin and Collection Staff roles-kku delete options block pannanum
+        const shouldHideDelete = currentUserRole.includes("admin") || currentUserRole.includes("collection");
+
+        if (shouldHideDelete) {
+            // Find all delete buttons (trash icons, title with 'delete', or delete onclicks)
             const deleteButtons = document.querySelectorAll("button[title*='Delete'], .fa-trash, [onclick*='delete']");
             
             deleteButtons.forEach(btn => {
@@ -65,10 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Initial check & continuous check for dynamically loaded tables (like loadReceipts)
-    hideDeleteButtons();
+    // Initial run & continuous DOM observer for dynamically rendered tables
+    applyDeleteRestrictions();
     
-    // MutationObserver to hide trash buttons when data tables load dynamically
-    const observer = new MutationObserver(hideDeleteButtons);
+    const observer = new MutationObserver(applyDeleteRestrictions);
     observer.observe(document.body, { childList: true, subtree: true });
 });
