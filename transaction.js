@@ -6,33 +6,32 @@
 // Deployment Web App link mapping node parameters 
 const TX_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby9Fwl090NE0lUuVmrgiXvFv_V7UGfg4nD9ZezIhabsuEMwS-8QvjE5lkXxQtD3FSZO/exec";
 
-// Local storage caching array sequence shifts
 let databaseTransactions = [];
 let operationalCustomerCache = []; 
 let mockTransactions = [];
 
-/**
- * INITIALIZATION & TAB SWITCHING LOGIC WITH ROLE RESTRICTIONS
- */
 document.addEventListener("DOMContentLoaded", function () {
-    // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     const recDate = document.getElementById("recDate");
     const txnDate = document.getElementById("txnDate");
     if (recDate) recDate.value = today;
     if (txnDate) txnDate.value = today;
 
-    // Default Tab Initialization
     switchTab('receipt');
 });
 
 function switchTab(tabType) {
-    // Check if Collection Staff is trying to access Accounts Transaction
-    const storedRole = (localStorage.getItem("vp_user_role") || "").toLowerCase();
-    const bodyText = (document.body.innerText || "").toLowerCase();
-    const isCollection = storedRole.includes("collection") || bodyText.includes("(collection staff)");
+    let userRole = "";
+    try {
+        userRole = localStorage.getItem("vp_user_role") || "";
+        if (!userRole && localStorage.getItem("vp_user")) {
+            const u = JSON.parse(localStorage.getItem("vp_user"));
+            userRole = u.role || u.userRole || u.type || "";
+        }
+    } catch (e) {}
 
-    // Block Collection Staff from opening Accounts Transaction
+    const isCollection = userRole.toLowerCase().includes("collection");
+
     if (isCollection && tabType === "account") {
         tabType = "receipt"; 
     }
@@ -63,9 +62,6 @@ function switchTab(tabType) {
     }
 }
 
-/**
- * FETCH CUSTOMER PROFILES AND SNAPSHOT METRICS ON BLUR ACTION
- */
 async function fetchProfileSnapshotMetrics() {
     const accountInput = document.getElementById('txAccountNo') ? document.getElementById('txAccountNo').value.toUpperCase().trim() : '';
     const verificationCard = document.getElementById('accountVerificationCard');
@@ -116,9 +112,6 @@ function simulateLocalSnapshot(accountInput) {
     }
 }
 
-/**
- * EXECUTE SECURE TRANSACTION POSTING ROUTINE
- */
 async function executeTransactionProcessing(event) {
     event.preventDefault();
 
