@@ -1,126 +1,94 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Fetch User Data from LocalStorage
-    let currentUserRole = "";
+    // 1. Fetch exact role safely from LocalStorage ONLY
+    let userRole = "";
     try {
-        const storedRole = localStorage.getItem("vp_user_role");
-        if (storedRole) {
-            currentUserRole = storedRole;
-        } else {
-            const storedUser = localStorage.getItem("vp_user");
-            if (storedUser) {
-                const parsed = JSON.parse(storedUser);
-                currentUserRole = parsed.role || parsed.userRole || "";
-            }
+        userRole = localStorage.getItem("vp_user_role") || "";
+        if (!userRole && localStorage.getItem("vp_user")) {
+            const u = JSON.parse(localStorage.getItem("vp_user"));
+            userRole = u.role || u.userRole || u.type || "";
         }
     } catch (e) {
-        console.error("Error reading role:", e);
+        console.error("Role reading error:", e);
     }
 
-    const roleLower = currentUserRole.toLowerCase().trim();
-    const bodyText = (document.body.innerText || "").toLowerCase();
+    const role = userRole.toLowerCase().trim();
 
-    const isCollectionStaff = roleLower.includes("collection") || bodyText.includes("(collection staff)");
-    const isAdmin = roleLower.includes("admin") || bodyText.includes("(admin)");
+    // Identify role strictly
+    const isCollectionStaff = role.includes("collection");
 
-    // ==========================================
-    // 2. DASHBOARD CARDS RESTRICTIONS
-    // ==========================================
-    if (window.location.pathname.includes("dashboard.html") || window.location.pathname.endsWith("/VPM/")) {
-        if (isCollectionStaff) {
-            const cards = document.querySelectorAll(".glass-card, main .grid > div, main a");
-            cards.forEach(card => {
-                const text = (card.innerText || "").toLowerCase();
-                if (
-                    text.includes("capital disbursement") ||
-                    text.includes("add new employee") ||
-                    text.includes("employee details") ||
-                    text.includes("cash book") ||
-                    text.includes("bank book")
-                ) {
-                    card.style.setProperty("display", "none", "important");
-                }
-            });
+    // If Role is NOT Collection Staff (Admin, Management, Accountant), STOP HERE. 
+    // They get FULL ACCESS (Cash Book & Bank Book will show normally)!
+    if (!isCollectionStaff) {
+        return; 
+    }
+
+    // =========================================================
+    // RESTRICTIONS BELOW ARE ONLY FOR COLLECTION STAFF
+    // =========================================================
+
+    const restrictedKeywords = [
+        "cash book",
+        "bank book",
+        "capital disbursement",
+        "add new employee",
+        "add employee",
+        "employee details"
+    ];
+
+    // 1. SIDEBAR RESTRICTIONS (For Collection Staff)
+    const sidebarLinks = document.querySelectorAll("aside a, #sidebar a, nav a");
+    sidebarLinks.forEach(link => {
+        const text = (link.innerText || "").toLowerCase().trim();
+        if (restrictedKeywords.some(key => text.includes(key))) {
+            link.style.setProperty("display", "none", "important");
         }
-    }
+    });
 
-    // ==========================================
-    // 3. SIDEBAR NAVIGATION RESTRICTIONS
-    // ==========================================
-    function enforceSidebar() {
-        const sidebarLinks = document.querySelectorAll("aside nav a, #sidebar nav a, nav a");
-        sidebarLinks.forEach(link => {
-            const text = (link.innerText || "").toLowerCase();
+    // 2. DASHBOARD CARDS RESTRICTIONS (For Collection Staff)
+    const isDashboard = window.location.pathname.includes("dashboard.html") || 
+                        window.location.pathname.endsWith("/VPM/") || 
+                        window.location.pathname.endsWith("/");
 
-            // Admin AND Collection Staff -> Hide Cash Book & Bank Book
-            if (isAdmin || isCollectionStaff) {
-                if (text.includes("cash book") || text.includes("bank book")) {
-                    link.style.setProperty("display", "none", "important");
-                }
-            }
-
-            // Collection Staff -> Hide Disbursal and Employee Setup
-            if (isCollectionStaff) {
-                if (text.includes("capital disbursement") || text.includes("add new employee") || text.includes("add employee")) {
-                    link.style.setProperty("display", "none", "important");
-                }
+    if (isDashboard) {
+        const cards = document.querySelectorAll("main .grid > div, main a, .glass-card");
+        cards.forEach(card => {
+            const text = (card.innerText || "").toLowerCase();
+            if (restrictedKeywords.some(key => text.includes(key))) {
+                card.style.setProperty("display", "none", "important");
             }
         });
     }
-    enforceSidebar();
 
-    // ==========================================
-    // 4. TRANSACTION.HTML TAB RESTRICTION (Fix for Pic 3)
-    // ==========================================
+    // 3. TRANSACTION PAGE TAB RESTRICTION (For Collection Staff)
     if (window.location.pathname.includes("transaction.html")) {
-        if (isCollectionStaff) {
-            function restrictTransactionTabs() {
-                // Hide Accounts Transaction Tab/Button
-                const allButtons = document.querySelectorAll("button, div, a, li");
-                allButtons.forEach(btn => {
-                    const txt = (btn.innerText || "").toLowerCase().trim();
-                    if (txt.includes("accounts transaction") || txt.includes("account transaction")) {
-                        btn.style.setProperty("display", "none", "important");
-                    }
-                });
-
-                // Ensure Customer Receipt form/tab is active
-                const receiptTab = Array.from(document.querySelectorAll("button")).find(b => 
-                    (b.innerText || "").toLowerCase().includes("customer receipt")
-                );
-                if (receiptTab && typeof switchTab === "function") {
-                    switchTab("receipt");
-                }
+        const buttons = document.querySelectorAll("button, div, a");
+        buttons.forEach(btn => {
+            const txt = (btn.innerText || "").toLowerCase().trim();
+            if (txt.includes("accounts transaction") || txt.includes("account transaction")) {
+                btn.style.setProperty("display", "none", "important");
             }
-            restrictTransactionTabs();
-            setTimeout(restrictTransactionTabs, 200);
+        });
+
+        // Switch automatically to Customer Receipt tab
+        if (typeof switchTab === "function") {
+            switchTab("receipt");
         }
     }
 
-    // ==========================================
-    // 5. DELETE BUTTON RESTRICTIONS (Admin & Collection Staff)
-    // ==========================================
-    function enforceDeleteRestrictions() {
-        if (isAdmin || isCollectionStaff) {
-            // Hide all trash icons and delete buttons dynamically
-            const deleteTargets = document.querySelectorAll(
-                "button[title*='Delete'], [onclick*='delete'], .fa-trash, .fa-trash-can, button.bg-rose-500\\/20, button.hover\\:bg-rose-500\\/20"
-            );
-
-            deleteTargets.forEach(el => {
-                const btn = el.tagName === "I" ? (el.closest("button") || el) : el;
-                if (btn) {
-                    btn.style.setProperty("display", "none", "important");
-                }
-            });
-        }
+    // 4. HIDE DELETE BUTTONS (For Collection Staff)
+    function hideDeleteButtons() {
+        const deleteTargets = document.querySelectorAll(
+            "button[title*='Delete'], [onclick*='delete'], .fa-trash, .fa-trash-can"
+        );
+        deleteTargets.forEach(el => {
+            const btn = el.tagName === "I" ? (el.closest("button") || el) : el;
+            if (btn) btn.style.setProperty("display", "none", "important");
+        });
     }
 
-    enforceDeleteRestrictions();
+    hideDeleteButtons();
 
-    // Continuous DOM Observer for dynamic loading tables
-    const observer = new MutationObserver(() => {
-        enforceSidebar();
-        enforceDeleteRestrictions();
-    });
+    // DOM Observer for dynamically loaded collection tables
+    const observer = new MutationObserver(hideDeleteButtons);
     observer.observe(document.body, { childList: true, subtree: true });
 });
