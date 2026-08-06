@@ -4,36 +4,44 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     // ----------------------------------------------------
-    // 1. GET & NORMALIZE USER ROLE
+    // 1. DETECT USER ROLE ACCURATELY
     // ----------------------------------------------------
-    let userRole = "management"; 
+    let userRole = "";
     try {
-        const rawRole = localStorage.getItem("vp_user_role");
-        if (rawRole) {
-            userRole = rawRole.toLowerCase().trim();
+        const storedRole = localStorage.getItem("vp_user_role");
+        if (storedRole) {
+            userRole = storedRole.toLowerCase().trim();
         } else if (localStorage.getItem("vp_user")) {
             const u = JSON.parse(localStorage.getItem("vp_user"));
-            userRole = (u.role || u.userRole || u.type || u.designation || "management").toLowerCase().trim();
+            userRole = (u.role || u.userRole || u.type || u.designation || "").toLowerCase().trim();
         }
     } catch (e) {
         console.error("Role parse error:", e);
     }
 
-    const isManagement = userRole.includes("manage") || userRole.includes("owner");
-    const isAdmin = userRole.includes("admin") && !isManagement;
-    const isAccountant = userRole.includes("account");
-    const isCollection = userRole.includes("collection") || userRole.includes("field") || userRole.includes("collector");
+    // Header label checking as fallback
+    const headerText = (document.body.innerText || "").toLowerCase();
+
+    // STRICT ROLE FLAGS
+    const isManagement = userRole.includes("management") || userRole.includes("owner") || headerText.includes("management");
+    const isAccountant = userRole.includes("accountant") || userRole.includes("account");
+    const isCollection = userRole.includes("collection") || userRole.includes("field") || userRole.includes("collector") || headerText.includes("collection staff");
+    
+    // Admin is ONLY true if it's explicitly Admin AND NOT Management/Accountant
+    const isAdmin = (userRole.includes("admin") || headerText.includes("admin")) && !isManagement && !isAccountant;
+
+    console.log("Current User Role Active:", { isManagement, isAccountant, isAdmin, isCollection, rawRole: userRole });
 
     // ----------------------------------------------------
     // 2. DYNAMIC SIDEBAR INJECTION (Cash Book & Bank Book)
     // ----------------------------------------------------
     function setupSidebar() {
-        if (isCollection) return; // Collection Staff-ukku Cash & Bank Book vara koodadhu
+        // Collection Staff-ukku Cash & Bank Book show aaga koodadhu
+        if (isCollection) return;
 
         const sidebarNav = document.querySelector("aside nav") || 
                            document.querySelector("#sidebar nav") || 
                            document.querySelector("aside .space-y-2") || 
-                           document.querySelector("aside div") ||
                            document.querySelector("aside");
 
         if (!sidebarNav) return;
@@ -56,7 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return a;
         }
 
-        // Passbook or Ledger link-kku keela insert pannum
         let targetAnchor = existingLinks.find(a => a.href.includes("passbook.html") || a.innerText.toLowerCase().includes("passbook"));
         if (!targetAnchor) {
             targetAnchor = existingLinks.find(a => a.href.includes("customer-list.html") || a.innerText.toLowerCase().includes("ledger"));
@@ -85,11 +92,10 @@ document.addEventListener("DOMContentLoaded", function () {
     setupSidebar();
 
     // ----------------------------------------------------
-    // 3. ROLE-BASED ACCESS CONTROL (RBAC)
+    // 3. APPLY ROLE-BASED PERMISSIONS
     // ----------------------------------------------------
     function applyRolePermissions() {
-        
-        // --- A. ADMIN ROLE (Edit allowed, Delete BLOCKED) ---
+        // --- A. ADMIN ROLE (Edit allowed, Delete HIDDEN) ---
         if (isAdmin) {
             hideDeleteButtons();
         }
@@ -99,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
             hideDeleteButtons();
             hideEditButtons();
 
-            // 1. Hide non-receipt sidebar links
+            // Hide non-receipt sidebar links
             const navLinks = document.querySelectorAll("aside a, #sidebar a, nav a");
             navLinks.forEach(link => {
                 const href = (link.getAttribute("href") || "").toLowerCase();
@@ -110,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // 2. Block direct URL access to restricted pages
+            // Block direct URL access to restricted pages
             const currentFile = window.location.pathname.split("/").pop().toLowerCase();
             const allowedPages = ["receipt.html", "receipts-hub.html", "receipt-hub.html", "login.html"];
             if (currentFile && !allowedPages.some(p => currentFile.includes(p))) {
@@ -118,11 +124,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // --- C. MANAGEMENT & ACCOUNTANT (Full Edit & Delete Allowed) ---
-        // Management & Accountant-kku automatic-a all Edit & Delete buttons show aagum.
+        // --- C. MANAGEMENT & ACCOUNTANT ---
+        // (Full access guaranteed - Edit and Delete options remain fully visible!)
     }
 
-    // Helper: Hide Delete Buttons Across DOM
     function hideDeleteButtons() {
         const deleteTargets = document.querySelectorAll(
             "button[title*='Delete'], button[title*='delete'], [onclick*='delete'], .fa-trash, .fa-trash-can, .btn-delete"
@@ -133,7 +138,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Helper: Hide Edit Buttons Across DOM
     function hideEditButtons() {
         const editTargets = document.querySelectorAll(
             "button[title*='Edit'], button[title*='edit'], [onclick*='edit'], .fa-pen, .fa-edit, .fa-pen-to-square, .btn-edit"
@@ -146,7 +150,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     applyRolePermissions();
 
-    // DOM dynamic-a update aagumpodhu (Table filter, Modals) permissions enforce panna
     const observer = new MutationObserver(applyRolePermissions);
     observer.observe(document.body, { childList: true, subtree: true });
 });
