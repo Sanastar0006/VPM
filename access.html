@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Access Matrix | VP Microfinance Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #0b0f19; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+        <!-- Header -->
+        <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-3">
+                    <i class="fa-solid fa-user-shield text-amber-400"></i> Dynamic Role Access Control
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">Configure page visibility, edit, delete & print permissions per role dynamically.</p>
+            </div>
+            <a href="dashboard.html" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-2 border border-slate-700 transition-all">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Role Selector Card -->
+        <div class="glass-card p-6 rounded-2xl">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-2">Select User Role To Configure</label>
+            <select id="roleSelect" onchange="loadRolePermissions()" class="w-full bg-slate-900/90 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:border-amber-500 focus:outline-none">
+                <option value="Admin">Admin</option>
+                <option value="Accountant">Accountant</option>
+                <option value="Collection Staff">Collection Staff</option>
+                <option value="Management">Management (Master Access)</option>
+            </select>
+        </div>
+
+        <!-- Permissions Control Grid -->
+        <div class="glass-card p-6 rounded-2xl space-y-6">
+            <h2 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-cyan-400"></i> Page Access Matrix
+            </h2>
+
+            <!-- Pages Checklist -->
+            <div id="permissionsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamic Checkboxes will render here -->
+            </div>
+
+            <!-- Global Action Controls -->
+            <div class="border-t border-slate-800 pt-6">
+                <h3 class="text-sm font-bold text-slate-300 mb-4">Action Permissions for Selected Role</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <label class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-xl border border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="permEdit" class="w-4 h-4 accent-amber-500 rounded">
+                        <span class="text-sm text-slate-300 font-medium">Allow Edit</span>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-xl border border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="permDelete" class="w-4 h-4 accent-red-500 rounded">
+                        <span class="text-sm text-slate-300 font-medium">Allow Delete</span>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-xl border border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="permPrint" class="w-4 h-4 accent-cyan-500 rounded">
+                        <span class="text-sm text-slate-300 font-medium">Print & PDF</span>
+                    </label>
+
+                    <label class="flex items-center gap-3 p-3 bg-slate-900/50 rounded-xl border border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="permWhatsApp" class="w-4 h-4 accent-emerald-500 rounded">
+                        <span class="text-sm text-slate-300 font-medium">WhatsApp Share</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="pt-4 flex justify-end">
+                <button onclick="savePermissions()" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Permissions Matrix
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ALL_PAGES = [
+            { id: "customer-add.html", label: "Customer Add" },
+            { id: "customer-list.html", label: "Customer List" },
+            { id: "employee-details.html", label: "Employee Details" },
+            { id: "user-add.html", label: "User Add" },
+            { id: "receipt.html", label: "Receipt Entry" },
+            { id: "receipts-hub.html", label: "Receipts Hub" },
+            { id: "transaction.html", label: "Transaction Matrix" },
+            { id: "passbook.html", label: "Customer Passbook" },
+            { id: "cash-book.html", label: "Cash Book" },
+            { id: "bank-book.html", label: "Bank Book" }
+        ];
+
+        const DEFAULT_MATRIX = {
+            "Management": {
+                pages: ALL_PAGES.map(p => p.id),
+                canEdit: true,
+                canDelete: true,
+                canPrint: true,
+                canWhatsApp: true
+            },
+            "Admin": {
+                pages: ["employee-details.html", "user-add.html", "customer-add.html", "customer-list.html", "receipt.html", "passbook.html", "receipts-hub.html", "cash-book.html", "bank-book.html"],
+                canEdit: true,
+                canDelete: false,
+                canPrint: true,
+                canWhatsApp: true
+            },
+            "Accountant": {
+                pages: ALL_PAGES.map(p => p.id),
+                canEdit: true,
+                canDelete: true,
+                canPrint: true,
+                canWhatsApp: true
+            },
+            "Collection Staff": {
+                pages: ["receipt.html", "receipts-hub.html"],
+                canEdit: false,
+                canDelete: false,
+                canPrint: true,
+                canWhatsApp: true
+            }
+        };
+
+        function getPermissionsMatrix() {
+            const saved = localStorage.getItem("vp_role_permissions_matrix");
+            return saved ? JSON.parse(saved) : DEFAULT_MATRIX;
+        }
+
+        function renderPagesGrid(selectedPages) {
+            const grid = document.getElementById("permissionsGrid");
+            grid.innerHTML = "";
+
+            ALL_PAGES.forEach(page => {
+                const isChecked = selectedPages.includes(page.id) ? "checked" : "";
+                const html = `
+                    <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" value="${page.id}" class="page-checkbox w-4 h-4 accent-amber-500 rounded" ${isChecked}>
+                        <span class="text-sm font-medium text-slate-300">${page.label}</span>
+                    </label>
+                `;
+                grid.innerHTML += html;
+            });
+        }
+
+        function loadRolePermissions() {
+            const selectedRole = document.getElementById("roleSelect").value;
+            const matrix = getPermissionsMatrix();
+            const roleData = matrix[selectedRole] || DEFAULT_MATRIX[selectedRole];
+
+            renderPagesGrid(roleData.pages);
+            document.getElementById("permEdit").checked = roleData.canEdit;
+            document.getElementById("permDelete").checked = roleData.canDelete;
+            document.getElementById("permPrint").checked = roleData.canPrint;
+            document.getElementById("permWhatsApp").checked = roleData.canWhatsApp;
+        }
+
+        function savePermissions() {
+            const selectedRole = document.getElementById("roleSelect").value;
+            const matrix = getPermissionsMatrix();
+
+            const checkedPages = Array.from(document.querySelectorAll(".page-checkbox:checked")).map(cb => cb.value);
+            
+            matrix[selectedRole] = {
+                pages: checkedPages,
+                canEdit: document.getElementById("permEdit").checked,
+                canDelete: document.getElementById("permDelete").checked,
+                canPrint: document.getElementById("permPrint").checked,
+                canWhatsApp: document.getElementById("permWhatsApp").checked
+            };
+
+            localStorage.setItem("vp_role_permissions_matrix", JSON.stringify(matrix));
+            alert(`🎉 Settings saved for [${selectedRole}]!`);
+        }
+
+        document.addEventListener("DOMContentLoaded", loadRolePermissions);
+    </script>
+</body>
+</html>
