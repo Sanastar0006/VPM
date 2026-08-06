@@ -1,155 +1,85 @@
 /**
- * VP MICROFINANCE PRO 2026 - RBAC & Navigation Controller
+ * Dynamic Role Execution Engine
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-    // ----------------------------------------------------
-    // 1. DETECT USER ROLE ACCURATELY
-    // ----------------------------------------------------
-    let userRole = "";
+    // 1. Fetch Active User Role
+    let userRole = "Management";
     try {
         const storedRole = localStorage.getItem("vp_user_role");
         if (storedRole) {
-            userRole = storedRole.toLowerCase().trim();
+            userRole = storedRole.trim();
         } else if (localStorage.getItem("vp_user")) {
             const u = JSON.parse(localStorage.getItem("vp_user"));
-            userRole = (u.role || u.userRole || u.type || u.designation || "").toLowerCase().trim();
+            userRole = u.role || u.userRole || u.type || u.designation || "Management";
         }
     } catch (e) {
         console.error("Role parse error:", e);
     }
 
-    // Header label checking as fallback
-    const headerText = (document.body.innerText || "").toLowerCase();
+    // Role Key Matching
+    let matchedRoleKey = "Management";
+    const rLower = userRole.toLowerCase();
+    if (rLower.includes("collection") || rLower.includes("field")) matchedRoleKey = "Collection Staff";
+    else if (rLower.includes("account")) matchedRoleKey = "Accountant";
+    else if (rLower.includes("admin") && !rLower.includes("manage")) matchedRoleKey = "Admin";
+    else matchedRoleKey = "Management";
 
-    // STRICT ROLE FLAGS
-    const isManagement = userRole.includes("management") || userRole.includes("owner") || headerText.includes("management");
-    const isAccountant = userRole.includes("accountant") || userRole.includes("account");
-    const isCollection = userRole.includes("collection") || userRole.includes("field") || userRole.includes("collector") || headerText.includes("collection staff");
-    
-    // Admin is ONLY true if it's explicitly Admin AND NOT Management/Accountant
-    const isAdmin = (userRole.includes("admin") || headerText.includes("admin")) && !isManagement && !isAccountant;
+    // 2. Load Permissions Matrix
+    const matrixString = localStorage.getItem("vp_role_permissions_matrix");
+    let permissions = null;
+    if (matrixString) {
+        try {
+            const fullMatrix = JSON.parse(matrixString);
+            permissions = fullMatrix[matchedRoleKey];
+        } catch (e) {}
+    }
 
-    console.log("Current User Role Active:", { isManagement, isAccountant, isAdmin, isCollection, rawRole: userRole });
-
-    // ----------------------------------------------------
-    // 2. DYNAMIC SIDEBAR INJECTION (Cash Book & Bank Book)
-    // ----------------------------------------------------
-    function setupSidebar() {
-        // Collection Staff-ukku Cash & Bank Book show aaga koodadhu
-        if (isCollection) return;
-
-        const sidebarNav = document.querySelector("aside nav") || 
-                           document.querySelector("#sidebar nav") || 
-                           document.querySelector("aside .space-y-2") || 
-                           document.querySelector("aside");
-
-        if (!sidebarNav) return;
-
-        const existingLinks = Array.from(sidebarNav.querySelectorAll("a"));
-        const currentPath = window.location.pathname.toLowerCase();
-
-        const hasCash = existingLinks.some(a => a.href.includes("cash-book.html") || a.innerText.toLowerCase().includes("cash book"));
-        const hasBank = existingLinks.some(a => a.href.includes("bank-book.html") || a.innerText.toLowerCase().includes("bank book"));
-
-        function createSidebarLink(href, iconClass, labelText, color) {
-            const a = document.createElement("a");
-            a.href = href;
-            const isActive = currentPath.includes(href);
-            a.className = isActive 
-                ? `flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm bg-${color}-500/10 text-${color}-400 border border-${color}-500/20 shadow-lg transition-all duration-200`
-                : "flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all duration-200";
-            
-            a.innerHTML = `<i class="${iconClass} text-${color}-400 text-lg"></i><span>${labelText}</span>`;
-            return a;
-        }
-
-        let targetAnchor = existingLinks.find(a => a.href.includes("passbook.html") || a.innerText.toLowerCase().includes("passbook"));
-        if (!targetAnchor) {
-            targetAnchor = existingLinks.find(a => a.href.includes("customer-list.html") || a.innerText.toLowerCase().includes("ledger"));
-        }
-
-        if (!hasCash) {
-            const cashLink = createSidebarLink("cash-book.html", "fa-solid fa-wallet", "Cash Book", "amber");
-            if (targetAnchor && targetAnchor.parentNode) {
-                targetAnchor.parentNode.insertBefore(cashLink, targetAnchor.nextSibling);
-                targetAnchor = cashLink;
-            } else {
-                sidebarNav.appendChild(cashLink);
-            }
-        }
-
-        if (!hasBank) {
-            const bankLink = createSidebarLink("bank-book.html", "fa-solid fa-building-columns", "Bank Book", "cyan");
-            if (targetAnchor && targetAnchor.parentNode) {
-                targetAnchor.parentNode.insertBefore(bankLink, targetAnchor.nextSibling);
-            } else {
-                sidebarNav.appendChild(bankLink);
-            }
+    // Default Fallbacks
+    if (!permissions) {
+        if (matchedRoleKey === "Admin") {
+            permissions = { pages: ["employee-details.html", "user-add.html", "customer-add.html", "customer-list.html", "receipt.html", "passbook.html", "receipts-hub.html", "cash-book.html", "bank-book.html"], canEdit: true, canDelete: false };
+        } else if (matchedRoleKey === "Collection Staff") {
+            permissions = { pages: ["receipt.html", "receipts-hub.html"], canEdit: false, canDelete: false };
+        } else {
+            permissions = { pages: ["customer-add.html", "customer-list.html", "employee-details.html", "user-add.html", "receipt.html", "receipts-hub.html", "transaction.html", "passbook.html", "cash-book.html", "bank-book.html"], canEdit: true, canDelete: true };
         }
     }
 
-    setupSidebar();
+    // 3. Enforce Sidebar Navigation Rules
+    const currentFile = window.location.pathname.split("/").pop().toLowerCase();
+    const sidebarLinks = document.querySelectorAll("aside a, #sidebar a, nav a");
 
-    // ----------------------------------------------------
-    // 3. APPLY ROLE-BASED PERMISSIONS
-    // ----------------------------------------------------
-    function applyRolePermissions() {
-        // --- A. ADMIN ROLE (Edit allowed, Delete HIDDEN) ---
-        if (isAdmin) {
-            hideDeleteButtons();
-        }
-
-        // --- B. COLLECTION STAFF ROLE (Strict Restricted Mode) ---
-        if (isCollection) {
-            hideDeleteButtons();
-            hideEditButtons();
-
-            // Hide non-receipt sidebar links
-            const navLinks = document.querySelectorAll("aside a, #sidebar a, nav a");
-            navLinks.forEach(link => {
-                const href = (link.getAttribute("href") || "").toLowerCase();
-                const text = (link.innerText || "").toLowerCase();
-                const isReceipt = href.includes("receipt") || text.includes("receipt");
-                if (!isReceipt) {
-                    link.style.setProperty("display", "none", "important");
-                }
-            });
-
-            // Block direct URL access to restricted pages
-            const currentFile = window.location.pathname.split("/").pop().toLowerCase();
-            const allowedPages = ["receipt.html", "receipts-hub.html", "receipt-hub.html", "login.html"];
-            if (currentFile && !allowedPages.some(p => currentFile.includes(p))) {
-                window.location.href = "receipts-hub.html";
+    sidebarLinks.forEach(link => {
+        const href = (link.getAttribute("href") || "").toLowerCase();
+        if (href) {
+            const isAllowed = permissions.pages.some(p => href.includes(p.toLowerCase()));
+            if (!isAllowed && !href.includes("dashboard")) {
+                link.style.setProperty("display", "none", "important");
             }
         }
+    });
 
-        // --- C. MANAGEMENT & ACCOUNTANT ---
-        // (Full access guaranteed - Edit and Delete options remain fully visible!)
+    // 4. Enforce Action Permissions (Edit / Delete)
+    if (!permissions.canDelete) {
+        hideElements("button[title*='Delete'], [onclick*='delete'], .fa-trash, .fa-trash-can, .btn-delete");
     }
 
-    function hideDeleteButtons() {
-        const deleteTargets = document.querySelectorAll(
-            "button[title*='Delete'], button[title*='delete'], [onclick*='delete'], .fa-trash, .fa-trash-can, .btn-delete"
-        );
-        deleteTargets.forEach(el => {
-            const btn = el.tagName === "I" ? (el.closest("button") || el.closest("a") || el) : el;
-            if (btn) btn.style.setProperty("display", "none", "important");
+    if (!permissions.canEdit) {
+        hideElements("button[title*='Edit'], [onclick*='edit'], .fa-pen, .fa-edit, .btn-edit");
+    }
+
+    function hideElements(selector) {
+        document.querySelectorAll(selector).forEach(el => {
+            const target = el.tagName === "I" ? (el.closest("button") || el.closest("a") || el) : el;
+            if (target) target.style.setProperty("display", "none", "important");
         });
     }
 
-    function hideEditButtons() {
-        const editTargets = document.querySelectorAll(
-            "button[title*='Edit'], button[title*='edit'], [onclick*='edit'], .fa-pen, .fa-edit, .fa-pen-to-square, .btn-edit"
-        );
-        editTargets.forEach(el => {
-            const btn = el.tagName === "I" ? (el.closest("button") || el.closest("a") || el) : el;
-            if (btn) btn.style.setProperty("display", "none", "important");
-        });
-    }
-
-    applyRolePermissions();
-
-    const observer = new MutationObserver(applyRolePermissions);
+    // Observer for dynamic elements
+    const observer = new MutationObserver(() => {
+        if (!permissions.canDelete) hideElements("button[title*='Delete'], [onclick*='delete'], .fa-trash, .fa-trash-can, .btn-delete");
+        if (!permissions.canEdit) hideElements("button[title*='Edit'], [onclick*='edit'], .fa-pen, .fa-edit, .btn-edit");
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 });
